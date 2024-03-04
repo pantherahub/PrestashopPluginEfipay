@@ -19,6 +19,6 @@
 
 {if !empty($transaction)}
   <section id="{$moduleName}-displayOrderDetail" class="box">
-    <p>{l s='Your transaction reference is %transaction%.' mod='paymentexample' sprintf=['%transaction%' => $transaction]}</p>
+    <p>{l s='Your transaction reference is %transaction%.' mod='efipaypayment' sprintf=['%transaction%' => $transaction]}</p>
   </section>
 {/if}

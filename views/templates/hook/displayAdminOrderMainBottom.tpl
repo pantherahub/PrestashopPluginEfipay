@@ -26,7 +26,7 @@
       </h3>
     </div>
     <div class="card-body">
-      <p>{l s='This order has been paid with %moduleDisplayName%.' mod='paymentexample' sprintf=['%moduleDisplayName%' => $moduleDisplayName]}</p>
+      <p>{l s='This order has been paid with %moduleDisplayName%.' mod='efipaypayment' sprintf=['%moduleDisplayName%' => $moduleDisplayName]}</p>
     </div>
   </div>
 </section>

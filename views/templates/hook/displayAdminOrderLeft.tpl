@@ -23,6 +23,6 @@
       <img src="{$moduleLogoSrc}" alt="{$moduleDisplayName}" width="15" height="15">
       {$moduleDisplayName}
     </div>
-    <p>{l s='This order has been paid with %moduleDisplayName%.' mod='paymentexample' sprintf=['%moduleDisplayName%' => $moduleDisplayName]}</p>
+    <p>{l s='This order has been paid with %moduleDisplayName%.' mod='efipaypayment' sprintf=['%moduleDisplayName%' => $moduleDisplayName]}</p>
   </div>
 </section>

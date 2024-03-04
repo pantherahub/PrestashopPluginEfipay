@@ -24,14 +24,14 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-class PaymentExample extends PaymentModule
+class EfipayPayment extends PaymentModule
 {
     const CONFIG_OS_OFFLINE = 'PAYMENTEXAMPLE_OS_OFFLINE';
     const CONFIG_PO_OFFLINE_ENABLED = 'PAYMENTEXAMPLE_PO_OFFLINE_ENABLED';
     const CONFIG_PO_EXTERNAL_ENABLED = 'PAYMENTEXAMPLE_PO_EXTERNAL_ENABLED';
     const CONFIG_PO_EMBEDDED_ENABLED = 'PAYMENTEXAMPLE_PO_EMBEDDED_ENABLED';
     const CONFIG_PO_BINARY_ENABLED = 'PAYMENTEXAMPLE_PO_BINARY_ENABLED';
-    const MODULE_ADMIN_CONTROLLER = 'AdminConfigurePaymentExample';
+    const MODULE_ADMIN_CONTROLLER = 'AdminConfigureEfipayPayment';
     const HOOKS = [
         'actionPaymentCCAdd',
         'actionObjectShopAddAfter',
@@ -48,14 +48,14 @@ class PaymentExample extends PaymentModule
 
     public function __construct()
     {
-        $this->name = 'paymentexample';
+        $this->name = 'efipaypayment';
         $this->tab = 'payments_gateways';
-        $this->version = '2.0.0';
-        $this->author = 'PrestaShop';
+        $this->version = '1.0.0';
+        $this->author = 'Efipay';
         $this->currencies = true;
         $this->currencies_mode = 'checkbox';
         $this->ps_versions_compliancy = [
-            'min' => '1.7',
+            'min' => '1.0',
             'max' => _PS_VERSION_,
         ];
         $this->controllers = [
@@ -67,8 +67,8 @@ class PaymentExample extends PaymentModule
 
         parent::__construct();
 
-        $this->displayName = $this->l('Payment Example');
-        $this->description = $this->l('Description of Payment Example');
+        $this->displayName = $this->l('Efipay Payments');
+        $this->description = $this->l('plugin para realizar a través de nuestro checkout de pagos Efipay');
     }
 
     /**
@@ -248,7 +248,7 @@ class PaymentExample extends PaymentModule
             'moduleLogoSrc' => $this->getPathUri() . 'logo.png',
         ]);
 
-        return $this->context->smarty->fetch('module:paymentexample/views/templates/hook/displayAdminOrderLeft.tpl');
+        return $this->context->smarty->fetch('module:efipaypayment/views/templates/hook/displayAdminOrderLeft.tpl');
     }
 
     /**
@@ -278,7 +278,7 @@ class PaymentExample extends PaymentModule
             'moduleLogoSrc' => $this->getPathUri() . 'logo.png',
         ]);
 
-        return $this->context->smarty->fetch('module:paymentexample/views/templates/hook/displayAdminOrderMainBottom.tpl');
+        return $this->context->smarty->fetch('module:efipaypayment/views/templates/hook/displayAdminOrderMainBottom.tpl');
     }
 
     /**
@@ -299,7 +299,7 @@ class PaymentExample extends PaymentModule
             ),
         ]);
 
-        return $this->context->smarty->fetch('module:paymentexample/views/templates/hook/displayCustomerAccount.tpl');
+        return $this->context->smarty->fetch('module:efipaypayment/views/templates/hook/displayCustomerAccount.tpl');
     }
 
     /**
@@ -335,7 +335,7 @@ class PaymentExample extends PaymentModule
             'transaction' => $transaction,
         ]);
 
-        return $this->context->smarty->fetch('module:paymentexample/views/templates/hook/displayOrderConfirmation.tpl');
+        return $this->context->smarty->fetch('module:efipaypayment/views/templates/hook/displayOrderConfirmation.tpl');
     }
 
     /**
@@ -371,7 +371,7 @@ class PaymentExample extends PaymentModule
             'transaction' => $transaction,
         ]);
 
-        return $this->context->smarty->fetch('module:paymentexample/views/templates/hook/displayOrderDetail.tpl');
+        return $this->context->smarty->fetch('module:efipaypayment/views/templates/hook/displayOrderDetail.tpl');
     }
 
     /**
@@ -394,7 +394,7 @@ class PaymentExample extends PaymentModule
             'action' => $this->context->link->getModuleLink($this->name, 'validation', ['option' => 'binary'], true),
         ]);
 
-        return $this->context->smarty->fetch('module:paymentexample/views/templates/hook/displayPaymentByBinaries.tpl');
+        return $this->context->smarty->fetch('module:efipaypayment/views/templates/hook/displayPaymentByBinaries.tpl');
     }
 
     /**
@@ -434,7 +434,7 @@ class PaymentExample extends PaymentModule
             ),
         ]);
 
-        return $this->context->smarty->fetch('module:paymentexample/views/templates/hook/displayPaymentReturn.tpl');
+        return $this->context->smarty->fetch('module:efipaypayment/views/templates/hook/displayPaymentReturn.tpl');
     }
 
     /**
@@ -476,7 +476,7 @@ class PaymentExample extends PaymentModule
             'transaction' => $transaction,
         ]);
 
-        return $this->context->smarty->fetch('module:paymentexample/views/templates/hook/displayPDFInvoice.tpl');
+        return $this->context->smarty->fetch('module:efipaypayment/views/templates/hook/displayPDFInvoice.tpl');
     }
 
     /**
@@ -516,7 +516,7 @@ class PaymentExample extends PaymentModule
         $offlineOption->setModuleName($this->name);
         $offlineOption->setCallToActionText($this->l('Pay offline'));
         $offlineOption->setAction($this->context->link->getModuleLink($this->name, 'validation', ['option' => 'offline'], true));
-        $offlineOption->setAdditionalInformation($this->context->smarty->fetch('module:paymentexample/views/templates/front/paymentOptionOffline.tpl'));
+        $offlineOption->setAdditionalInformation($this->context->smarty->fetch('module:efipaypayment/views/templates/front/paymentOptionOffline.tpl'));
         $offlineOption->setLogo(Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/option/offline.png'));
 
         return $offlineOption;
@@ -540,7 +540,7 @@ class PaymentExample extends PaymentModule
                 'value' => '[5cbfniD+(gEV<59lYbG/,3VmHiE<U46;#G9*#NP#X.FA§]sb%ZG?5Q{xQ4#VM|7',
             ],
         ]);
-        $externalOption->setAdditionalInformation($this->context->smarty->fetch('module:paymentexample/views/templates/front/paymentOptionExternal.tpl'));
+        $externalOption->setAdditionalInformation($this->context->smarty->fetch('module:efipaypayment/views/templates/front/paymentOptionExternal.tpl'));
         $externalOption->setLogo(Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/option/external.png'));
 
         return $externalOption;
@@ -557,7 +557,7 @@ class PaymentExample extends PaymentModule
         $embeddedOption->setModuleName($this->name);
         $embeddedOption->setCallToActionText($this->l('Pay embedded'));
         $embeddedOption->setForm($this->generateEmbeddedForm());
-        $embeddedOption->setAdditionalInformation($this->context->smarty->fetch('module:paymentexample/views/templates/front/paymentOptionEmbedded.tpl'));
+        $embeddedOption->setAdditionalInformation($this->context->smarty->fetch('module:efipaypayment/views/templates/front/paymentOptionEmbedded.tpl'));
         $embeddedOption->setLogo(Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/option/embedded.png'));
 
         return $embeddedOption;
@@ -573,7 +573,7 @@ class PaymentExample extends PaymentModule
         $binaryOption = new PaymentOption();
         $binaryOption->setModuleName($this->name);
         $binaryOption->setCallToActionText($this->l('Pay binary'));
-        $binaryOption->setAdditionalInformation($this->context->smarty->fetch('module:paymentexample/views/templates/front/paymentOptionBinary.tpl'));
+        $binaryOption->setAdditionalInformation($this->context->smarty->fetch('module:efipaypayment/views/templates/front/paymentOptionBinary.tpl'));
         $binaryOption->setLogo(Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/option/binary.png'));
         $binaryOption->setBinary(true);
 
@@ -591,7 +591,7 @@ class PaymentExample extends PaymentModule
             'action' => $this->context->link->getModuleLink($this->name, 'validation', ['option' => 'embedded'], true),
         ]);
 
-        return $this->context->smarty->fetch('module:paymentexample/views/templates/front/paymentOptionEmbeddedForm.tpl');
+        return $this->context->smarty->fetch('module:efipaypayment/views/templates/front/paymentOptionEmbeddedForm.tpl');
     }
 
     /**

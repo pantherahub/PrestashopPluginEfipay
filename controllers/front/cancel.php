@@ -23,7 +23,7 @@
  *
  * @todo If you use a webhook or automatic response do not use redirection
  */
-class PaymentExampleCancelModuleFrontController extends ModuleFrontController
+class EfipayPaymentCancelModuleFrontController extends ModuleFrontController
 {
     /**
      * {@inheritdoc}

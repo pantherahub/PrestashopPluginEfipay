@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <module>
-    <name>paymentexample</name>
+    <name>efipaypayment</name>
     <displayName><![CDATA[Payment Example]]></displayName>
     <version><![CDATA[2.0.0]]></version>
     <description><![CDATA[Description of Payment Example]]></description>

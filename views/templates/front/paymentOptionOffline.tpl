@@ -17,6 +17,6 @@
  * @license   https://opensource.org/licenses/AFL-3.0 Academic Free License 3.0 (AFL-3.0)
  *}
 
-<section id="paymentexample-offline">
-  <p>{l s='Offline payment like check or bank wire : Order will be created with custom OrderState "Awaiting offline payment".' mod='paymentexample'}</p>
+<section id="efipaypayment-offline">
+  <p>{l s='Offline payment like check or bank wire : Order will be created with custom OrderState "Awaiting offline payment".' mod='efipaypayment'}</p>
 </section>

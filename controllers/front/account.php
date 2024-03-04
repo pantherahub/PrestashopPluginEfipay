@@ -21,7 +21,7 @@
 /**
  * This Controller display transactions in customer account
  */
-class PaymentExampleAccountModuleFrontController extends ModuleFrontController
+class EfipayPaymentAccountModuleFrontController extends ModuleFrontController
 {
     /**
      * {@inheritdoc}
@@ -77,6 +77,6 @@ class PaymentExampleAccountModuleFrontController extends ModuleFrontController
             'orderPayments' => $orderPayments,
         ]);
 
-        $this->setTemplate('module:paymentexample/views/templates/front/account.tpl');
+        $this->setTemplate('module:efipaypayment/views/templates/front/account.tpl');
     }
 }

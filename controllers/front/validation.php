@@ -21,7 +21,7 @@
 /**
  * This Controller receive customer after approval on bank payment page
  */
-class PaymentExampleValidationModuleFrontController extends ModuleFrontController
+class EfipayPaymentValidationModuleFrontController extends ModuleFrontController
 {
     /**
      * @var PaymentModule
@@ -132,7 +132,7 @@ class PaymentExampleValidationModuleFrontController extends ModuleFrontControlle
 
         switch ($option) {
             case 'offline':
-                $orderStateId = (int) Configuration::get(PaymentExample::CONFIG_OS_OFFLINE);
+                $orderStateId = (int) Configuration::get(EfipayPayment::CONFIG_OS_OFFLINE);
                 break;
             case 'external':
                 $orderStateId = (int) Configuration::get('PS_OS_WS_PAYMENT');

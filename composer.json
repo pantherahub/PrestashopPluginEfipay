@@ -1,8 +1,8 @@
 {
     "type": "prestashop-module",
-    "name": "prestashop/paymentexample",
-    "description": "PrestaShop module paymentexample",
-    "homepage": "https://github.com/PrestaShop/paymentexample",
+    "name": "prestashop/efipaypayment",
+    "description": "PrestaShop module efipaypayment",
+    "homepage": "https://github.com/PrestaShop/efipaypayment",
     "license": "AFL-3.0",
     "authors": [
         {
@@ -23,7 +23,7 @@
     "autoload": {
         "classmap": [
             "controllers",
-            "paymentexample.php"
+            "efipaypayment.php"
         ]
     },
     "scripts": {

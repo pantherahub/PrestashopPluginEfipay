@@ -17,6 +17,6 @@
  * @license   https://opensource.org/licenses/AFL-3.0 Academic Free License 3.0 (AFL-3.0)
  *}
 
-<section id="paymentexample-binary">
-  <p>{l s='Binary payment : Order will be created with OrderState "Payment accepted".' mod='paymentexample'}</p>
+<section id="efipaypayment-binary">
+  <p>{l s='Binary payment : Order will be created with OrderState "Payment accepted".' mod='efipaypayment'}</p>
 </section>

@@ -17,6 +17,6 @@
  * @license   https://opensource.org/licenses/AFL-3.0 Academic Free License 3.0 (AFL-3.0)
  *}
 
-<section id="paymentexample-external">
-  <p>{l s='External payment like redirection to external secured payment page : Order will be created with OrderState "Remote payment accepted".' mod='paymentexample'}</p>
+<section id="efipaypayment-external">
+  <p>{l s='External payment like redirection to external secured payment page : Order will be created with OrderState "Remote payment accepted".' mod='efipaypayment'}</p>
 </section>

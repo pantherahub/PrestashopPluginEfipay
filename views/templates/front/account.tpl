@@ -20,7 +20,7 @@
 {extends file='customer/page.tpl'}
 
 {block name='page_title'}
-  <h1 class="h1">{$moduleDisplayName} - {l s='Transactions' mod='paymentexample'}</h1>
+  <h1 class="h1">{$moduleDisplayName} - {l s='Transactions' mod='efipaypayment'}</h1>
 {/block}
 
 {block name='page_content'}
@@ -28,11 +28,11 @@
     <table class="table table-striped table-bordered hidden-sm-down">
       <thead class="thead-default">
       <tr>
-        <th>{l s='Order reference' mod='paymentexample'}</th>
-        <th>{l s='Payment method' mod='paymentexample'}</th>
-        <th>{l s='Transaction reference' mod='paymentexample'}</th>
-        <th>{l s='Amount' mod='paymentexample'}</th>
-        <th>{l s='Date' mod='paymentexample'}</th>
+        <th>{l s='Order reference' mod='efipaypayment'}</th>
+        <th>{l s='Payment method' mod='efipaypayment'}</th>
+        <th>{l s='Transaction reference' mod='efipaypayment'}</th>
+        <th>{l s='Amount' mod='efipaypayment'}</th>
+        <th>{l s='Date' mod='efipaypayment'}</th>
       </tr>
       </thead>
       <tbody>
@@ -48,6 +48,6 @@
       </tbody>
     </table>
   {else}
-    <div class="alert alert-info">{l s='No transaction' mod='paymentexample'}</div>
+    <div class="alert alert-info">{l s='No transaction' mod='efipaypayment'}</div>
   {/if}
 {/block}

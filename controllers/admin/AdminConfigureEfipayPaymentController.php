@@ -17,7 +17,7 @@
  * @copyright Since 2007 PrestaShop SA and Contributors
  * @license   https://opensource.org/licenses/AFL-3.0 Academic Free License 3.0 (AFL-3.0)
  */
-class AdminConfigurePaymentExampleController extends ModuleAdminController
+class AdminConfigureEfipayPaymentController extends ModuleAdminController
 {
     public function __construct()
     {
@@ -34,28 +34,28 @@ class AdminConfigurePaymentExampleController extends ModuleAdminController
         $this->fields_options = [
             $this->module->name => [
                 'fields' => [
-                    PaymentExample::CONFIG_PO_OFFLINE_ENABLED => [
+                    EfipayPayment::CONFIG_PO_OFFLINE_ENABLED => [
                         'type' => 'bool',
                         'title' => $this->l('Allow to pay with offline method'),
                         'validation' => 'isBool',
                         'cast' => 'intval',
                         'required' => false,
                     ],
-                    PaymentExample::CONFIG_PO_EXTERNAL_ENABLED => [
+                    EfipayPayment::CONFIG_PO_EXTERNAL_ENABLED => [
                         'type' => 'bool',
                         'title' => $this->l('Allow to pay with external method'),
                         'validation' => 'isBool',
                         'cast' => 'intval',
                         'required' => false,
                     ],
-                    PaymentExample::CONFIG_PO_EMBEDDED_ENABLED => [
+                    EfipayPayment::CONFIG_PO_EMBEDDED_ENABLED => [
                         'type' => 'bool',
                         'title' => $this->l('Allow to pay with embedded method'),
                         'validation' => 'isBool',
                         'cast' => 'intval',
                         'required' => false,
                     ],
-                    PaymentExample::CONFIG_PO_BINARY_ENABLED => [
+                    EfipayPayment::CONFIG_PO_BINARY_ENABLED => [
                         'type' => 'bool',
                         'title' => $this->l('Allow to pay with binary method'),
                         'validation' => 'isBool',

@@ -24,7 +24,7 @@ if (!defined('_PS_VERSION_')) {
 /**
  * An example of module upgrade file
  *
- * @param PaymentExample $module
+ * @param EfipayPayment $module
  *
  * @return bool
  */

@@ -21,7 +21,7 @@
 /**
  * This Controller simulate an external payment gateway
  */
-class PaymentExampleExternalModuleFrontController extends ModuleFrontController
+class EfipayPaymentExternalModuleFrontController extends ModuleFrontController
 {
     /**
      * {@inheritdoc}
@@ -64,7 +64,7 @@ class PaymentExampleExternalModuleFrontController extends ModuleFrontController
             'action' => $this->context->link->getModuleLink($this->module->name, 'validation', ['option' => 'external'], true),
         ]);
 
-        $this->setTemplate('module:paymentexample/views/templates/front/external.tpl');
+        $this->setTemplate('module:efipaypayment/views/templates/front/external.tpl');
     }
 
     /**
@@ -88,7 +88,7 @@ class PaymentExampleExternalModuleFrontController extends ModuleFrontController
      */
     private function checkIfPaymentOptionIsAvailable()
     {
-        if (!Configuration::get(PaymentExample::CONFIG_PO_EXTERNAL_ENABLED)) {
+        if (!Configuration::get(EfipayPayment::CONFIG_PO_EXTERNAL_ENABLED)) {
             return false;
         }
 
