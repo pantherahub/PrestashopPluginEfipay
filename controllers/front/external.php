@@ -39,17 +39,77 @@ class EfipayPaymentExternalModuleFrontController extends ModuleFrontController
             ));
         }
 
-        $customer = new Customer($this->context->cart->id_customer);
+        // Obtener el monto total a cobrar
+        $cart = $this->context->cart;
+        $totalAmount = $cart->getOrderTotal();
 
-        if (false === Validate::isLoadedObject($customer)) {
-            Tools::redirect($this->context->link->getPageLink(
-                'order',
-                true,
-                (int) $this->context->language->id,
-                [
-                    'step' => 1,
-                ]
-            ));
+        // Obtener el tipo de moneda utilizada en el carrito
+        $currency = new Currency($cart->id_currency);
+        $currencyCode = $currency->iso_code;
+
+        // var_dump(Configuration::get(Tools::getValue('comercio')));
+        // return;
+
+        $data = [
+            "payment" => [
+                "description" => 'Pago Plugin Prestashop',
+                "amount" => $totalAmount,
+                "currency_type" => $currencyCode,
+                "checkout_type" => "redirect"
+            ],
+            "advanced_options" => [
+                "result_urls" => [
+                    "approved" => "https://google.com/",
+                    "rejected" => "https://google.com/",
+                    "pending" => "https://google.com/",
+                ],
+                "has_comments" => true,
+                "comments_label" => "Aqui tu comentario"
+            ],
+            "office" => Configuration::get(EfipayPayment::CONFIG_ID_COMERCIO)
+        ];
+        
+        // URL a la que deseas enviar la consulta
+        $url = 'https://efipay-sag.redpagos.co/api/v1/payment/generate-payment';
+        
+        // Token de barrera
+        $bearerToken = "8|UJAcP9IAJOcPteH1WQ1DtIdCa4eO9FS122wE9vLB0c14feae";
+        
+        $headers = [
+            'Content-Type' => 'application/json', // Ejemplo de encabezado
+            "Authorization" => "Bearer {$bearerToken}" // Ejemplo de encabezado con un token de autorización
+        ];
+        
+        $client = new GuzzleHttp\Client();
+        
+        try {
+            // Realizar la solicitud POST utilizando Guzzle
+            $response = $client->post($url, [
+                'headers' => $headers,
+                'json' => $data,
+                'http_errors' => false // Para manejar manualmente los errores HTTP
+            ]);
+        
+            // Obtener el cuerpo de la respuesta
+            $body = $response->getBody()->getContents();
+        
+            // Verificar si hubo algún error
+            if ($response->getStatusCode() != 200) {
+                echo 'Error: ' . $response->getStatusCode() . ' ' . $response->getReasonPhrase();
+            } else {
+                // Parsear la respuesta JSON para obtener la URL de redirección
+                $responseData = json_decode($body, true);
+                $redirectUrl = $responseData['url'] ?? null;
+                
+                if ($redirectUrl) {
+                    
+                    Tools::redirect($redirectUrl);
+                } else {
+                    echo "No se encontró la URL de redirección en la respuesta.";
+                }
+            }
+        } catch (GuzzleHttp\Exception\RequestException $e) {
+            echo 'Error: ' . $e->getCode() . ' ' . $e->getMessage();
         }
     }
 
@@ -59,12 +119,6 @@ class EfipayPaymentExternalModuleFrontController extends ModuleFrontController
     public function initContent()
     {
         parent::initContent();
-
-        $this->context->smarty->assign([
-            'action' => $this->context->link->getModuleLink($this->module->name, 'validation', ['option' => 'external'], true),
-        ]);
-
-        $this->setTemplate('module:efipaypayment/views/templates/front/external.tpl');
     }
 
     /**
