@@ -30,6 +30,7 @@ class EfipayPaymentEmbeddedModuleFrontController extends ModuleFrontController
 
     private $bearerToken;
     private $idComercio;
+    private $urlBase;
 
     public function __construct()
     {
@@ -37,6 +38,7 @@ class EfipayPaymentEmbeddedModuleFrontController extends ModuleFrontController
 
         $this->bearerToken = Configuration::get(EfipayPayment::CONFIG_API_KEY);
         $this->idComercio = Configuration::get(EfipayPayment::CONFIG_ID_COMERCIO);
+        $this->urlBase = "https://efipay-sag.redpagos.co/api/v1/";
     }
 
     /**
@@ -54,7 +56,6 @@ class EfipayPaymentEmbeddedModuleFrontController extends ModuleFrontController
                 ]
             ));
         }
-
 
         // Obtener detalles de la transacción
         $totalAmount = (float) $this->context->cart->getOrderTotal();
@@ -122,9 +123,6 @@ class EfipayPaymentEmbeddedModuleFrontController extends ModuleFrontController
             ],
             "office" => $this->idComercio
         ];
-        
-        // URL a la que deseas enviar la consulta
-        $url = 'https://efipay-sag.redpagos.co/api/v1/payment/generate-payment';
 
         $headers = [
             'Content-Type' => 'application/json', // Ejemplo de encabezado
@@ -135,7 +133,7 @@ class EfipayPaymentEmbeddedModuleFrontController extends ModuleFrontController
         
         try {
             // Realizar la solicitud POST utilizando Guzzle
-            $response = $client->post($url, [
+            $response = $client->post($this->urlBase.'payment/generate-payment', [
                 'headers' => $headers,
                 'json' => $data,
                 'http_errors' => false // Para manejar manualmente los errores HTTP
@@ -187,9 +185,6 @@ class EfipayPaymentEmbeddedModuleFrontController extends ModuleFrontController
             ] 
         ];
         
-        
-        // URL a la que deseas enviar la consulta
-        $url = 'https://efipay-sag.redpagos.co/api/v1/payment/transaction-checkout';
         $headers = [
             'Content-Type' => 'application/json', // Ejemplo de encabezado
             "Authorization" => "Bearer {$this->bearerToken}" // Ejemplo de encabezado con un token de autorización
@@ -199,7 +194,7 @@ class EfipayPaymentEmbeddedModuleFrontController extends ModuleFrontController
         
         try {
             // Realizar la solicitud POST utilizando Guzzle
-            $response = $client->post($url, [
+            $response = $client->post($this->urlBase.'payment/transaction-checkout', [
                 'headers' => $headers,
                 'json' => $data,
             ]);
@@ -207,7 +202,6 @@ class EfipayPaymentEmbeddedModuleFrontController extends ModuleFrontController
             // Obtener el cuerpo de la respuesta
             $body = $response->getBody();
             
-        
             // Verificar si hubo algún error
             if ($response->getStatusCode() != 200) {
                 echo 'Error: ' . $response->getStatusCode() . ' ' . $response->getReasonPhrase();

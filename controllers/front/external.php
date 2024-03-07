@@ -23,6 +23,19 @@
  */
 class EfipayPaymentExternalModuleFrontController extends ModuleFrontController
 {
+    private $bearerToken;
+    private $idComercio;
+    private $urlBase;
+
+    public function __construct()
+    {
+        parent::__construct();
+
+        $this->bearerToken = Configuration::get(EfipayPayment::CONFIG_API_KEY);
+        $this->idComercio = Configuration::get(EfipayPayment::CONFIG_ID_COMERCIO);
+        $this->urlBase = "https://efipay-sag.redpagos.co/api/v1/";
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -47,9 +60,6 @@ class EfipayPaymentExternalModuleFrontController extends ModuleFrontController
         $currency = new Currency($cart->id_currency);
         $currencyCode = $currency->iso_code;
 
-        // var_dump(Configuration::get(Tools::getValue('comercio')));
-        // return;
-
         $data = [
             "payment" => [
                 "description" => 'Pago Plugin Prestashop',
@@ -66,25 +76,19 @@ class EfipayPaymentExternalModuleFrontController extends ModuleFrontController
                 "has_comments" => true,
                 "comments_label" => "Aqui tu comentario"
             ],
-            "office" => Configuration::get(EfipayPayment::CONFIG_ID_COMERCIO)
+            "office" => $this->idComercio
         ];
-        
-        // URL a la que deseas enviar la consulta
-        $url = 'https://efipay-sag.redpagos.co/api/v1/payment/generate-payment';
-        
-        // Token de barrera
-        $bearerToken = "8|UJAcP9IAJOcPteH1WQ1DtIdCa4eO9FS122wE9vLB0c14feae";
-        
+            
         $headers = [
             'Content-Type' => 'application/json', // Ejemplo de encabezado
-            "Authorization" => "Bearer {$bearerToken}" // Ejemplo de encabezado con un token de autorización
+            "Authorization" => "Bearer {$this->bearerToken}" // Ejemplo de encabezado con un token de autorización
         ];
         
         $client = new GuzzleHttp\Client();
         
         try {
             // Realizar la solicitud POST utilizando Guzzle
-            $response = $client->post($url, [
+            $response = $client->post($this->urlBase. 'payment/generate-payment', [
                 'headers' => $headers,
                 'json' => $data,
                 'http_errors' => false // Para manejar manualmente los errores HTTP
@@ -102,7 +106,6 @@ class EfipayPaymentExternalModuleFrontController extends ModuleFrontController
                 $redirectUrl = $responseData['url'] ?? null;
                 
                 if ($redirectUrl) {
-                    
                     Tools::redirect($redirectUrl);
                 } else {
                     echo "No se encontró la URL de redirección en la respuesta.";
