@@ -69,8 +69,8 @@ class EfipayPaymentExternalModuleFrontController extends ModuleFrontController
             ],
             "advanced_options" => [
                 "result_urls" => [
-                    "approved" => "https://google.com/",
-                    "rejected" => "https://google.com/",
+                    "approved" => $this->context->link->getModuleLink($this->module->name, 'responseSuccess', [], true),
+                    "rejected" => $this->context->link->getModuleLink($this->module->name, 'responseError', [], true),
                     "pending" => "https://google.com/",
                 ],
                 "has_comments" => true,

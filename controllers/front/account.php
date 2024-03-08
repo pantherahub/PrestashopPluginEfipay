@@ -56,7 +56,7 @@ class EfipayPaymentAccountModuleFrontController extends ModuleFrontController
                     (int) $orderPayment['id_currency']
                 );
 
-                if (version_compare(_PS_VERSION_, '>=', '8')) {
+                if (version_compare(_PS_VERSION_, '8', '>=')) {
                     $formattedDate = Tools::displayDate(
                         $orderPayment['date_add'],
                         true
