@@ -57,25 +57,24 @@ class EfipayPaymentEmbeddedModuleFrontController extends ModuleFrontController
             ));
         }
 
-        // Obtener detalles de la transacción
+        // Obtener el monto y la moneda a pagar
         $totalAmount = (float) $this->context->cart->getOrderTotal();
         $currencyId = (int) $this->context->currency->id;
 
         // Enviar la solicitud a la pasarela de pagos
         $paymentResponse = $this->generatePayment();
-        return;
-
+        
         // Manejar la respuesta de la pasarela de pagos
-        if ($paymentResponse['success']) {
+        if ($paymentResponse['status'] == 'Aprobada') {
             $this->module->validateOrder(
                 (int) $this->context->cart->id,
-                (int) Configuration::get('PS_OS_ERROR'),
+                (int) Configuration::get('PS_OS_PAYMENT'),
                 $totalAmount,
                 $this->module->displayName, // Nombre del método de pago
                 null,
-                ['transaction_id' => $paymentResponse['transaction_id']], // Información adicional
+                ['transaction_id' => $paymentResponse['paymentId']], // Información adicional
                 $currencyId,
-                false,
+                true,
                 $this->context->customer->secure_key
             );
     
@@ -88,9 +87,20 @@ class EfipayPaymentEmbeddedModuleFrontController extends ModuleFrontController
                 ]
             ));
         } else {
-            // Si la transacción falló, redirigir al cliente a la página de pago con un mensaje de error
-            $errorMessage = $paymentResponse['error_message'];
-            Tools::redirect($this->context->link->getPageLink('order', true, $this->context->language->id, ['step' => 3, 'payment_error' => $errorMessage]));
+            $this->context->smarty->assign([
+                'errorMessage' => 'No se pudo realizar el pago, intente nuevamente',
+                'moduleName' => $this->module->name,
+                'transactionsLink' => $this->context->link->getPageLink(
+                    'order',
+                    true,
+                    (int) $this->context->language->id,
+                    [
+                        'step' => 1,
+                    ]
+                ),
+            ]);
+    
+            $this->setTemplate('module:efipaypayment/views/templates/front/paymentFail.tpl');
         }
     }
 
@@ -204,10 +214,16 @@ class EfipayPaymentEmbeddedModuleFrontController extends ModuleFrontController
             
             // Verificar si hubo algún error
             if ($response->getStatusCode() != 200) {
-                echo 'Error: ' . $response->getStatusCode() . ' ' . $response->getReasonPhrase();
+                return [
+                    'status' => 'rechazada'
+                ];
             } else {
                 $responseData = json_decode($body, true);
-                return $responseData;
+        
+                return [
+                    'paymentId' => $generatePaymentResponse['payment_id'],
+                    'status' => isset($responseData['transaction']['status']) ? $responseData['transaction']['status'] : 'rechazada'
+                ];
             }
         } catch (GuzzleHttp\Exception\RequestException $e) {
             echo 'Error: ' . $e->getCode() . ' ' . $e->getMessage();
@@ -249,67 +265,4 @@ class EfipayPaymentEmbeddedModuleFrontController extends ModuleFrontController
 
         return false;
     }
-
-
-    // ------------------------------------------------------------------
-    // Comentado mientras se hace el pago y se pueda proceder a validar la orden
-    // ------------------------------------------------------------------
-
-    // /**
-    //  * Get OrderState identifier
-    //  *
-    //  * @return int
-    //  */
-    // private function getOrderState()
-    // {
-    //     $option = Tools::getValue('option');
-    //     $orderStateId = (int) Configuration::get('PS_OS_ERROR');
-
-    //     switch ($option) {
-    //         case 'offline':
-    //             $orderStateId = (int) Configuration::get(EfipayPayment::CONFIG_OS_OFFLINE);
-    //             break;
-    //         case 'external':
-    //             $orderStateId = (int) Configuration::get('PS_OS_WS_PAYMENT');
-    //             break;
-    //         case 'iframe':
-    //         case 'embedded':
-    //         case 'binary':
-    //             $orderStateId = (int) Configuration::get('PS_OS_PAYMENT');
-    //             break;
-    //     }
-
-    //     return $orderStateId;
-    // }
-
-    // /**
-    //  * Get translated Payment Option name
-    //  *
-    //  * @return string
-    //  */
-    // private function getOptionName()
-    // {
-    //     $option = Tools::getValue('option');
-    //     $name = $this->module->displayName;
-
-    //     switch ($option) {
-    //         case 'offline':
-    //             $name = $this->l('Offline');
-    //             break;
-    //         case 'external':
-    //             $name = $this->l('External');
-    //             break;
-    //         case 'iframe':
-    //             $name = $this->l('Iframe');
-    //             break;
-    //         case 'embedded':
-    //             $name = $this->l('Embedded');
-    //             break;
-    //         case 'binary':
-    //             $name = $this->l('Binary');
-    //             break;
-    //     }
-
-    //     return $name;
-    // }
 }
