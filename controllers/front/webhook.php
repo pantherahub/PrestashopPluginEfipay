@@ -26,10 +26,10 @@ class EfipayPaymentWebhookModuleFrontController extends ModuleFrontController
 
         // Obtener los datos enviados por la pasarela de pago
         
-         // Verificar si la solicitud se realizó utilizando el método POST
-         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $data = $_POST;
-            var_dump($_REQUEST, $_POST, $_SERVER);
+        // Verificar si la solicitud se realizó utilizando el método POST
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $data = json_decode(file_get_contents('php://input'), true);
+            var_dump($data['transaction']['status'], $_REQUEST, $_POST);
         }
         
 

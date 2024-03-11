@@ -263,21 +263,23 @@ class EfipayPayment extends PaymentModule
         ];
     }
 
-    public function processWebhookData($request)
+    public function processWebhookData($data)
     {
-        var_dump($request);
         // Aquí procesa los datos recibidos y actualiza la orden en PrestaShop
-        // Por ejemplo, puedes buscar la orden por su identificador y actualizar su estado según los datos recibidos
 
-        // $newStatus = $data['transaction']['status']; // Nuevo estado de la orden (aprobada, rechazada, pendiente, etc.)
-        // // Actualiza el estado de la orden en PrestaShop
-        // $order = new Order(EfipayPayment::$orderCreatedId);
-        // if (Validate::isLoadedObject($order)) {
-        //     $order->setCurrentState($this->mapStatus($newStatus));
-        //     return ['order' => $order];
-        // }
+        $newStatus = $data['transaction']['status']; // Nuevo estado de la orden (aprobada, rechazada, pendiente, etc.)
+        $orderId = (int)$data['checkout']['payment_gateway']['advanced_option']['references'][0];
+        
+        // Actualiza el estado de la orden en PrestaShop
+        $order = new Order($orderId);
+        // var_dump(Validate::isLoadedObject($order), $orderId, $order->reference);
+        // return;
+        if (Validate::isLoadedObject($order)) {
+            $order->setCurrentState($this->mapStatus($newStatus));
+            return ['order' => $order];
+        }
 
-        // return false;
+        return false;
     }
 
     // Método para mapear los estados de la pasarela de pago a los estados de la orden en PrestaShop
