@@ -38,7 +38,10 @@ class EfipayPayment extends PaymentModule
 
     const MODULE_ADMIN_CONTROLLER = 'AdminConfigureEfipayPayment';
 
+    public static $orderCreatedId = 0;
+
     const HOOKS = [
+        'moduleRoutes',
         'actionPaymentCCAdd',
         'actionObjectShopAddAfter',
         'paymentOptions',
@@ -50,6 +53,7 @@ class EfipayPayment extends PaymentModule
         'displayPaymentByBinaries',
         'displayPaymentReturn',
         'displayPDFInvoice',
+        'displayPaymentTop'
     ];
 
     public function __construct()
@@ -225,6 +229,73 @@ class EfipayPayment extends PaymentModule
         }
 
         return $paymentOptions;
+    }
+
+    public function hookDisplayPaymentTop($params)
+    {
+        $payment_error = '';
+        if (isset($this->context->cookie->payment_error)) {
+            $payment_error = $this->context->cookie->payment_error;
+            unset($this->context->cookie->payment_error); // Limpiar la sesión después de mostrar el error
+        }
+
+        $this->context->smarty->assign([
+            'payment_error' => $payment_error
+        ]);
+
+        return $this->display(__FILE__, 'views/templates/front/payment_error.tpl');
+    }
+
+    // Agregar la ruta para el webhook
+    public function hookModuleRoutes($params) {
+        return [
+            'hook_webhook' => [
+                'controller' => 'webhook',
+                'rule' => 'webhook',
+                // 'keywords' => [
+                   
+                // ],
+                'params' => [
+                    'fc' => 'module',
+                    'module' => $this->name,
+                ],
+            ],
+        ];
+    }
+
+    public function processWebhookData($request)
+    {
+        var_dump($request);
+        // Aquí procesa los datos recibidos y actualiza la orden en PrestaShop
+        // Por ejemplo, puedes buscar la orden por su identificador y actualizar su estado según los datos recibidos
+
+        // $newStatus = $data['transaction']['status']; // Nuevo estado de la orden (aprobada, rechazada, pendiente, etc.)
+        // // Actualiza el estado de la orden en PrestaShop
+        // $order = new Order(EfipayPayment::$orderCreatedId);
+        // if (Validate::isLoadedObject($order)) {
+        //     $order->setCurrentState($this->mapStatus($newStatus));
+        //     return ['order' => $order];
+        // }
+
+        // return false;
+    }
+
+    // Método para mapear los estados de la pasarela de pago a los estados de la orden en PrestaShop
+    public function mapStatus($status)
+    {
+        // Aquí puedes definir la lógica de mapeo de estados según tu requerimiento
+        // Por ejemplo, puedes asignar 'Aprobada' a un estado específico de PrestaShop
+        switch ($status) {
+            case 'Aprobada':
+                return Configuration::get('PS_OS_PAYMENT'); // Estado de pago aprobado en PrestaShop
+            case 'Rechazada':
+                return Configuration::get('PS_OS_ERROR'); // Estado de error en PrestaShop
+            case 'Pendiente':
+                return Configuration::get('PS_OS_PREPARATION'); // Estado de preparación en PrestaShop
+            // Agrega más casos según tus necesidades
+            default:
+                return Configuration::get('PS_OS_ERROR'); // Estado de error en PrestaShop (por defecto)
+        }
     }
 
     /**

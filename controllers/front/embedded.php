@@ -57,19 +57,91 @@ class EfipayPaymentEmbeddedModuleFrontController extends ModuleFrontController
             ));
         }
 
-        // Obtener el monto y la moneda a pagar
-        $totalAmount = (float) $this->context->cart->getOrderTotal();
-        $currencyId = (int) $this->context->currency->id;
+
+        // prueba validación de campos
+        $form_error = $this->validateForm();
+
+        if(!empty($form_error)) {
+            $this->context->cookie->payment_error = $form_error;
+            Tools::redirect('order');
+        }
+        // ---------------------------------------------------------
+
 
         // Enviar la solicitud a la pasarela de pagos
         $paymentResponse = $this->generatePayment();
         
         // Manejar la respuesta de la pasarela de pagos
         if ($paymentResponse['status'] == 'Aprobada') {
-            Tools::redirect($this->context->link->getModuleLink($this->module->name, 'responseSuccess', [], true));
+            // Tools::redirect($this->context->link->getModuleLink($this->module->name, 'responseSuccess', [], true));
+            
+            // Obtener el monto total a cobrar
+            $cart = $this->context->cart;
+            $totalAmount = $cart->getOrderTotal();         
+
+            $this->module->validateOrder(
+                (int) $this->context->cart->id,
+                (int) Configuration::get('PS_OS_PAYMENT'),
+                $totalAmount,
+                $this->module->displayName, // Nombre del método de pago
+                null,
+                ['transaction_id' => Tools::passwdGen()], // Información adicional
+                $cart->id_currency,
+                true,
+                $this->context->customer->secure_key
+            );
+
+            Tools::redirect($this->context->link->getPageLink('order-confirmation', true, (int) $this->context->language->id,
+                [
+                    'id_cart' => (int) $this->context->cart->id,
+                    'id_module' => (int) $this->module->id,
+                    'id_order' => (int) $this->module->currentOrder,
+                    'key' => $this->context->customer->secure_key,
+                ]
+            ));
         } else {
             Tools::redirect($this->context->link->getModuleLink($this->module->name, 'responseError', [], true));
         }
+    }
+
+    private function validateForm() {
+        if (!preg_match('/^\d{16}$/', Tools::getValue('cardNumber'))) {
+            return "El campo Número de tarjeta es obligatorio.";
+        }
+
+        if (empty(Tools::getValue('cardHolder')) || !Validate::isGenericName(Tools::getValue('cardHolder'))) {
+            return "El campo nombre es obligatorio.";
+        }
+
+        if (empty(Tools::getValue('cardExpiration')) || !preg_match('/^\d{4}-\d{2}$/', Tools::getValue('cardExpiration'))) {
+            return "El campo fecha de expiración es obligatorio.";
+        }
+
+        if (empty(Tools::getValue('cardCVC')) || !preg_match('/^\d{3}$/', Tools::getValue('cardCVC'))) {
+            return "El campo codigo de seguridad es obligatorio y debe contener 3 digitos.";
+        }
+
+        if (empty(Tools::getValue('identificationType'))) {
+            return "El campo tipo de identificación es obligatorio.";
+        }
+
+        if (empty(Tools::getValue('idNumber')) || !Validate::isInt(Tools::getValue('idNumber'))) {
+            return "El campo numero de idemtificiación es obligatorio y deber ser un numero entero.";
+        }
+
+        if (empty(Tools::getValue('installments')) || !Validate::isInt(Tools::getValue('installments'))) {
+            return "El campo cuotas es obligatorio.";
+        }
+
+        if (empty(Tools::getValue('diallingCode'))) {
+            return "El campo indicativo es obligatorio.";
+        }
+
+        if (empty(Tools::getValue('cellphone')) || !Validate::isPhoneNumber(Tools::getValue('cellphone'))) {
+            return "El campo numero celular es obligatorio y debe ser un numero valido.";
+        }
+
+        return '';
     }
 
 

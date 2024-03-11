@@ -60,6 +60,19 @@ class EfipayPaymentExternalModuleFrontController extends ModuleFrontController
         $currency = new Currency($cart->id_currency);
         $currencyCode = $currency->iso_code;
 
+        // crear la orden con el estado pendiente de pago
+        $orderCreatedId = $this->module->validateOrder(
+            (int) $this->context->cart->id,
+            (int) Configuration::get('PS_OS_BANKWIRE'),
+            $totalAmount,
+            $this->module->displayName, // Nombre del método de pago
+            null,
+            ['transaction_id' => Tools::passwdGen()], // Información adicional
+            $currencyId,
+            true,
+            $this->context->customer->secure_key
+        );
+
         $data = [
             "payment" => [
                 "description" => 'Pago Plugin Prestashop',
@@ -72,6 +85,10 @@ class EfipayPaymentExternalModuleFrontController extends ModuleFrontController
                     "approved" => $this->context->link->getModuleLink($this->module->name, 'responseSuccess', [], true),
                     "rejected" => $this->context->link->getModuleLink($this->module->name, 'responseError', [], true),
                     "pending" => "https://google.com/",
+                    "webhook" => $this->context->link->getModuleLink($this->module->name, 'webhook', [], true),
+                ],
+                "references" => [
+                    'order_id' => $orderCreatedId,
                 ],
                 "has_comments" => true,
                 "comments_label" => "Aqui tu comentario"

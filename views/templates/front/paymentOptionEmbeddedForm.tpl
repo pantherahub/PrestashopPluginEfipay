@@ -22,7 +22,7 @@
 
     <div class="form-group">
         <label class="form-control-label" for="cardNumber">{l s='Card number' mod='efipaypayment'}</label>
-        <input value="5249314023340339" type="text" name="cardNumber" id="cardNumber" class="form-control" autocomplete="cc-number" required>
+        <input value="5249314023340339" type="number" name="cardNumber" id="cardNumber" class="form-control" autocomplete="cc-number" required>
     </div>
 
     <div class="form-group">
@@ -38,7 +38,7 @@
 
         <div class="form-group col-xs-6">
             <label class="form-control-label" for="cardExpiration">{l s='Expiration' mod='efipaypayment'}</label>
-            <input value="2024-05" type="text" name="cardExpiration" id="cardExpiration" class="form-control" placeholder="YYYY-MM" autocomplete="cc-exp" required>
+            <input  type="month" name="cardExpiration" id="cardExpiration" class="form-control" placeholder="YYYY-MM" autocomplete="cc-exp" required>
         </div>
     </div>
 
