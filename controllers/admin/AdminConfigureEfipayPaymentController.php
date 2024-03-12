@@ -53,22 +53,18 @@ class AdminConfigureEfipayPaymentController extends ModuleAdminController
                     EfipayPayment::CONFIG_ID_COMERCIO => [
                         'type' => 'text',
                         'title' => $this->l('Id comercio'),
-                        // 'validation' => 'isText',
+                        'validation' => 'isInt',
                         'cast' => 'intval',
                         'required' => true,
                     ],
                     EfipayPayment::CONFIG_PAYMENT_TOKEN => [
                         'type' => 'text',
                         'title' => $this->l('token'),
-                        // 'validation' => 'isText',
-                        // 'cast' => 'intval',
                         'required' => true,
                     ],
                     EfipayPayment::CONFIG_API_KEY => [
                         'type' => 'text',
                         'title' => $this->l('Api Key'),
-                        // 'validation' => 'isText',
-                        // 'cast' => 'intval',
                         'required' => true,
                     ],
                 ],
