@@ -35,35 +35,18 @@ class EfipayPaymentResponseSuccessModuleFrontController extends ModuleFrontContr
     {
         parent::initContent();
 
-        // Obtener el monto y la moneda a pagar
-        $totalAmount = (float) $this->context->cart->getOrderTotal();
-        $currencyId = (int) $this->context->currency->id;
-        
-        
-        // $this->module->validateOrder(
-        //     (int) $this->context->cart->id,
-        //     (int) Configuration::get('PS_OS_PAYMENT'),
-        //     $totalAmount,
-        //     $this->module->displayName, // Nombre del método de pago
-        //     null,
-        //     ['transaction_id' => Tools::passwdGen()], // Información adicional
-        //     $currencyId,
-        //     true,
-        //     $this->context->customer->secure_key
-        // );
-
         // Actualiza el estado de la orden en PrestaShop
-        $order = new Order(EfipayPayment::$orderCreatedId);
+        $orderId = (int)Tools::getValue('orderId');
+        $order = new Order($orderId);
         if (Validate::isLoadedObject($order)) {
-            $order->setCurrentState($this->mapStatus($newStatus));
-            return true;
+            $order->setCurrentState(Configuration::get('PS_OS_PAYMENT'));
         }
 
         Tools::redirect($this->context->link->getPageLink('order-confirmation', true, (int) $this->context->language->id,
             [
-                'id_cart' => (int) $this->context->cart->id,
+                'id_cart' => (int) $orderId,
                 'id_module' => (int) $this->module->id,
-                'id_order' => (int) $this->module->currentOrder,
+                'id_order' => (int) $orderId,
                 'key' => $this->context->customer->secure_key,
             ]
         ));

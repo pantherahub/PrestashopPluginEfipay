@@ -38,8 +38,6 @@ class EfipayPayment extends PaymentModule
 
     const MODULE_ADMIN_CONTROLLER = 'AdminConfigureEfipayPayment';
 
-    public static $orderCreatedId = 0;
-
     const HOOKS = [
         'moduleRoutes',
         'actionPaymentCCAdd',
@@ -231,7 +229,7 @@ class EfipayPayment extends PaymentModule
         return $paymentOptions;
     }
 
-    public function hookDisplayPaymentTop($params)
+    public function hookDisplayPaymentTop()
     {
         $payment_error = '';
         if (isset($this->context->cookie->payment_error)) {
@@ -252,9 +250,6 @@ class EfipayPayment extends PaymentModule
             'hook_webhook' => [
                 'controller' => 'webhook',
                 'rule' => 'webhook',
-                // 'keywords' => [
-                   
-                // ],
                 'params' => [
                     'fc' => 'module',
                     'module' => $this->name,
@@ -265,15 +260,12 @@ class EfipayPayment extends PaymentModule
 
     public function processWebhookData($data)
     {
-        // Aquí procesa los datos recibidos y actualiza la orden en PrestaShop
-
         $newStatus = $data['transaction']['status']; // Nuevo estado de la orden (aprobada, rechazada, pendiente, etc.)
         $orderId = (int)$data['checkout']['payment_gateway']['advanced_option']['references'][0];
-        
+
         // Actualiza el estado de la orden en PrestaShop
         $order = new Order($orderId);
-        // var_dump(Validate::isLoadedObject($order), $orderId, $order->reference);
-        // return;
+        
         if (Validate::isLoadedObject($order)) {
             $order->setCurrentState($this->mapStatus($newStatus));
             return ['order' => $order];

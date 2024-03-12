@@ -23,16 +23,12 @@ class EfipayPaymentWebhookModuleFrontController extends ModuleFrontController
     public function initContent()
     {
         parent::initContent();
-
-        // Obtener los datos enviados por la pasarela de pago
         
         // Verificar si la solicitud se realizó utilizando el método POST
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $data = json_decode(file_get_contents('php://input'), true);
-            var_dump($data['transaction']['status'], $_REQUEST, $_POST);
         }
         
-
         // Procesar los datos y actualizar la orden en PrestaShop
         if ($this->module->processWebhookData($data)) {
             // Enviar una respuesta exitosa

@@ -30,6 +30,13 @@ class EfipayPaymentResponseErrorModuleFrontController extends ModuleFrontControl
     {
         parent::initContent();
 
+        // Actualiza el estado de la orden en PrestaShop
+        $orderId = (int)Tools::getValue('orderId');
+        $order = new Order($orderId);
+        if (Validate::isLoadedObject($order)) {
+            $order->setCurrentState(Configuration::get('PS_OS_ERROR'));
+        }
+
         $this->context->smarty->assign([
             'errorMessage' => 'No se pudo realizar el pago, intente nuevamente',
             'moduleName' => $this->module->name,

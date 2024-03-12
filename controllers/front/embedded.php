@@ -72,9 +72,7 @@ class EfipayPaymentEmbeddedModuleFrontController extends ModuleFrontController
         $paymentResponse = $this->generatePayment();
         
         // Manejar la respuesta de la pasarela de pagos
-        if ($paymentResponse['status'] == 'Aprobada') {
-            // Tools::redirect($this->context->link->getModuleLink($this->module->name, 'responseSuccess', [], true));
-            
+        if ($paymentResponse['status'] == 'Aprobada') {          
             // Obtener el monto total a cobrar
             $cart = $this->context->cart;
             $totalAmount = $cart->getOrderTotal();         
@@ -100,7 +98,20 @@ class EfipayPaymentEmbeddedModuleFrontController extends ModuleFrontController
                 ]
             ));
         } else {
-            Tools::redirect($this->context->link->getModuleLink($this->module->name, 'responseError', [], true));
+            $this->context->smarty->assign([
+                'errorMessage' => 'No se pudo realizar el pago, intente nuevamente',
+                'moduleName' => $this->module->name,
+                'transactionsLink' => $this->context->link->getPageLink(
+                    'order',
+                    true,
+                    (int) $this->context->language->id,
+                    [
+                        'step' => 1,
+                    ]
+                ),
+            ]);
+    
+            $this->setTemplate('module:efipaypayment/views/templates/front/paymentFail.tpl');
         }
     }
 
@@ -182,11 +193,10 @@ class EfipayPaymentEmbeddedModuleFrontController extends ModuleFrontController
         $client = new GuzzleHttp\Client();
         
         try {
-            // Realizar la solicitud POST utilizando Guzzle
             $response = $client->post($this->urlBase.'payment/generate-payment', [
                 'headers' => $headers,
                 'json' => $data,
-                'http_errors' => false // Para manejar manualmente los errores HTTP
+                'http_errors' => false
             ]);
         
             // Obtener el cuerpo de la respuesta

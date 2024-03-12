@@ -72,8 +72,7 @@ class EfipayPaymentExternalModuleFrontController extends ModuleFrontController
             true,
             $this->context->customer->secure_key
         );
-        // var_dump($this->context->cart->id);
-        // return;
+       
         $data = [
             "payment" => [
                 "description" => 'Pago Plugin Prestashop',
@@ -86,8 +85,8 @@ class EfipayPaymentExternalModuleFrontController extends ModuleFrontController
                     (string)$this->context->cart->id,
                 ],
                 "result_urls" => [
-                    "approved" => $this->context->link->getModuleLink($this->module->name, 'responseSuccess', [], true),
-                    "rejected" => $this->context->link->getModuleLink($this->module->name, 'responseError', [], true),
+                    "approved" => $this->context->link->getModuleLink($this->module->name, 'responseSuccess', ['orderId' => $this->context->cart->id], true),
+                    "rejected" => $this->context->link->getModuleLink($this->module->name, 'responseError', ['orderId' => $this->context->cart->id], true),
                     "pending" => "https://google.com/",
                     "webhook" => $this->context->link->getModuleLink($this->module->name, 'webhook', [], true),
                 ],
@@ -98,8 +97,8 @@ class EfipayPaymentExternalModuleFrontController extends ModuleFrontController
         ];
             
         $headers = [
-            'Content-Type' => 'application/json', // Ejemplo de encabezado
-            "Authorization" => "Bearer {$this->bearerToken}" // Ejemplo de encabezado con un token de autorización
+            'Content-Type' => 'application/json',
+            "Authorization" => "Bearer {$this->bearerToken}"
         ];
         
         $client = new GuzzleHttp\Client();
