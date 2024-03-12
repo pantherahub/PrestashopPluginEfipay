@@ -594,9 +594,14 @@ class EfipayPayment extends PaymentModule
         $body = $response->getBody()->getContents();
         $identificationTypes = json_decode($body, true);
 
+        $response = $client->get("https://countryapi.io/api/all?apikey=fSbUBLWBYbu1R7kKCoDfnoqR9afIKejwZAzkTEhh");
+        $body = $response->getBody()->getContents();
+        $countries = json_decode($body, true);
+
         $this->context->smarty->assign([
             'action' => $this->context->link->getModuleLink($this->name, 'embedded', [], true),
             'identificationTypes' => $identificationTypes,
+            'countries' => $countries
         ]);
 
         return $this->context->smarty->fetch('module:efipaypayment/views/templates/front/paymentOptionEmbeddedForm.tpl');

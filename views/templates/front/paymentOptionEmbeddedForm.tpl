@@ -72,13 +72,10 @@
         <div class="form-group col-xs-4">
             <label class="form-control-label" for="diallingCode">{l s='Indicativo' mod='efipaypayment'}</label>
             <select name="diallingCode" id="diallingCode" class="form-control" required>
-                <option disabled selected>{l s='Please choose a identification type' mod='efipaypayment'}</option>
-                <option value="+57">Colombia</option>
-                <option value="+376">Andorra</option>
-                <option value="+971">United Arab Emirates</option>
-                <option value="+93">Afghanistan</option>
-                <option value="+1">Antigua</option>
-                <option value="+1">Anguilla</option>
+                <option disabled selected>{l s='Please choose a country' mod='efipaypayment'}</option>
+                {foreach $countries as $country}
+                    <option value="{$country.callingCode}">{$country.name}</option>
+                {/foreach} 
             </select>
         </div>
 
