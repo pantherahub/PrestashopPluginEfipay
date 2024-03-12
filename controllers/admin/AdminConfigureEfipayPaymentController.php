@@ -55,14 +55,6 @@ class AdminConfigureEfipayPaymentController extends ModuleAdminController
                         'cast' => 'intval',
                         'required' => false,
                     ],
-                    EfipayPayment::CONFIG_PO_BINARY_ENABLED => [
-                        'type' => 'bool',
-                        'title' => $this->l('Allow to pay with binary method'),
-                        'validation' => 'isBool',
-                        'cast' => 'intval',
-                        'required' => false,
-                    ],
-
                     
                     // Add new fields              
                     EfipayPayment::CONFIG_ID_COMERCIO => [

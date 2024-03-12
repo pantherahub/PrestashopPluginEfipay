@@ -139,7 +139,6 @@ class EfipayPaymentValidationModuleFrontController extends ModuleFrontController
                 break;
             case 'iframe':
             case 'embedded':
-            case 'binary':
                 $orderStateId = (int) Configuration::get('PS_OS_PAYMENT');
                 break;
         }
@@ -169,9 +168,6 @@ class EfipayPaymentValidationModuleFrontController extends ModuleFrontController
                 break;
             case 'embedded':
                 $name = $this->l('Embedded');
-                break;
-            case 'binary':
-                $name = $this->l('Binary');
                 break;
         }
 
