@@ -34,13 +34,6 @@ class AdminConfigureEfipayPaymentController extends ModuleAdminController
         $this->fields_options = [
             $this->module->name => [
                 'fields' => [
-                    EfipayPayment::CONFIG_PO_OFFLINE_ENABLED => [
-                        'type' => 'bool',
-                        'title' => $this->l('Allow to pay with offline method'),
-                        'validation' => 'isBool',
-                        'cast' => 'intval',
-                        'required' => false,
-                    ],
                     EfipayPayment::CONFIG_PO_EXTERNAL_ENABLED => [
                         'type' => 'bool',
                         'title' => $this->l('Allow to pay with external method'),

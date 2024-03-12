@@ -27,7 +27,6 @@ if (!defined('_PS_VERSION_')) {
 class EfipayPayment extends PaymentModule
 {
     const CONFIG_OS_OFFLINE = 'PAYMENTEXAMPLE_OS_OFFLINE';
-    const CONFIG_PO_OFFLINE_ENABLED = 'PAYMENTEXAMPLE_PO_OFFLINE_ENABLED';
     const CONFIG_PO_EXTERNAL_ENABLED = 'PAYMENTEXAMPLE_PO_EXTERNAL_ENABLED';
     const CONFIG_PO_EMBEDDED_ENABLED = 'PAYMENTEXAMPLE_PO_EMBEDDED_ENABLED';
 
@@ -207,10 +206,6 @@ class EfipayPayment extends PaymentModule
         }
 
         $paymentOptions = [];
-
-        if (Configuration::get(static::CONFIG_PO_OFFLINE_ENABLED)) {
-            $paymentOptions[] = $this->getOfflinePaymentOption();
-        }
 
         if (Configuration::get(static::CONFIG_PO_EXTERNAL_ENABLED)) {
             $paymentOptions[] = $this->getExternalPaymentOption();
@@ -547,23 +542,6 @@ class EfipayPayment extends PaymentModule
     }
 
     /**
-     * Factory of PaymentOption for Offline Payment
-     *
-     * @return PaymentOption
-     */
-    private function getOfflinePaymentOption()
-    {
-        $offlineOption = new PaymentOption();
-        $offlineOption->setModuleName($this->name);
-        $offlineOption->setCallToActionText($this->l('Pay offline'));
-        $offlineOption->setAction($this->context->link->getModuleLink($this->name, 'validation', ['option' => 'offline'], true));
-        $offlineOption->setAdditionalInformation($this->context->smarty->fetch('module:efipaypayment/views/templates/front/paymentOptionOffline.tpl'));
-        $offlineOption->setLogo(Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/option/offline.png'));
-
-        return $offlineOption;
-    }
-
-    /**
      * Factory of PaymentOption for External Payment
      *
      * @return PaymentOption
@@ -788,8 +766,7 @@ class EfipayPayment extends PaymentModule
      */
     private function installConfiguration()
     {
-        return (bool) Configuration::updateGlobalValue(static::CONFIG_PO_OFFLINE_ENABLED, '1')
-            && (bool) Configuration::updateGlobalValue(static::CONFIG_PO_EXTERNAL_ENABLED, '1')
+        return (bool) Configuration::updateGlobalValue(static::CONFIG_PO_EXTERNAL_ENABLED, '1')
             && (bool) Configuration::updateGlobalValue(static::CONFIG_PO_EMBEDDED_ENABLED, '1')
             
             && (string) Configuration::updateGlobalValue(static::CONFIG_ID_COMERCIO, '')
@@ -804,8 +781,7 @@ class EfipayPayment extends PaymentModule
      */
     private function uninstallConfiguration()
     {
-        return (bool) Configuration::deleteByName(static::CONFIG_PO_OFFLINE_ENABLED)
-            && (bool) Configuration::deleteByName(static::CONFIG_PO_EXTERNAL_ENABLED)
+        return (bool) Configuration::deleteByName(static::CONFIG_PO_EXTERNAL_ENABLED)
             && (bool) Configuration::deleteByName(static::CONFIG_PO_EMBEDDED_ENABLED)
 
             && (string) Configuration::deleteByName(static::CONFIG_ID_COMERCIO)

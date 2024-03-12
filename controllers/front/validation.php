@@ -131,9 +131,6 @@ class EfipayPaymentValidationModuleFrontController extends ModuleFrontController
         $orderStateId = (int) Configuration::get('PS_OS_ERROR');
 
         switch ($option) {
-            case 'offline':
-                $orderStateId = (int) Configuration::get(EfipayPayment::CONFIG_OS_OFFLINE);
-                break;
             case 'external':
                 $orderStateId = (int) Configuration::get('PS_OS_WS_PAYMENT');
                 break;
@@ -157,9 +154,6 @@ class EfipayPaymentValidationModuleFrontController extends ModuleFrontController
         $name = $this->module->displayName;
 
         switch ($option) {
-            case 'offline':
-                $name = $this->l('Offline');
-                break;
             case 'external':
                 $name = $this->l('External');
                 break;
