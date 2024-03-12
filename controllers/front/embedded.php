@@ -70,48 +70,27 @@ class EfipayPaymentEmbeddedModuleFrontController extends ModuleFrontController
 
         // Enviar la solicitud a la pasarela de pagos
         $paymentResponse = $this->generatePayment();
+
+        $cart = $this->context->cart;
+        $totalAmount = $cart->getOrderTotal();
+
+        $this->module->validateOrder(
+            (int) $this->context->cart->id,
+            (int) Configuration::get('PS_OS_BANKWIRE'), 
+            $totalAmount,
+            $this->module->displayName, // Nombre del método de pago
+            null,
+            ['transaction_id' => Tools::passwdGen()], // Información adicional
+            $cart->id_currency,
+            true,
+            $this->context->customer->secure_key
+        );
         
         // Manejar la respuesta de la pasarela de pagos
-        if ($paymentResponse['status'] == 'Aprobada') {          
-            // Obtener el monto total a cobrar
-            $cart = $this->context->cart;
-            $totalAmount = $cart->getOrderTotal();         
-
-            $this->module->validateOrder(
-                (int) $this->context->cart->id,
-                (int) Configuration::get('PS_OS_PAYMENT'),
-                $totalAmount,
-                $this->module->displayName, // Nombre del método de pago
-                null,
-                ['transaction_id' => Tools::passwdGen()], // Información adicional
-                $cart->id_currency,
-                true,
-                $this->context->customer->secure_key
-            );
-
-            Tools::redirect($this->context->link->getPageLink('order-confirmation', true, (int) $this->context->language->id,
-                [
-                    'id_cart' => (int) $this->context->cart->id,
-                    'id_module' => (int) $this->module->id,
-                    'id_order' => (int) $this->module->currentOrder,
-                    'key' => $this->context->customer->secure_key,
-                ]
-            ));
-        } else {
-            $this->context->smarty->assign([
-                'errorMessage' => 'No se pudo realizar el pago, intente nuevamente',
-                'moduleName' => $this->module->name,
-                'transactionsLink' => $this->context->link->getPageLink(
-                    'order',
-                    true,
-                    (int) $this->context->language->id,
-                    [
-                        'step' => 1,
-                    ]
-                ),
-            ]);
-    
-            $this->setTemplate('module:efipaypayment/views/templates/front/paymentFail.tpl');
+        if ($paymentResponse['status'] == 'Aprobada') {
+            Tools::redirect($this->context->link->getModuleLink($this->module->name, 'responseSuccess', ['orderId' => $this->context->cart->id], true));
+        } else {       
+            Tools::redirect($this->context->link->getModuleLink($this->module->name, 'responseError', ['orderId' => $this->context->cart->id], true));
         }
     }
 
