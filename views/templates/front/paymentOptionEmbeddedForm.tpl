@@ -22,23 +22,23 @@
 
     <div class="form-group">
         <label class="form-control-label" for="cardNumber">{l s='Número de la tarjeta' mod='efipaypayment'}</label>
-        <input value="5249314023340339" type="number" name="cardNumber" id="cardNumber" class="form-control" autocomplete="cc-number" required>
+        <input type="number" name="cardNumber" id="cardNumber" class="form-control" autocomplete="cc-number" required>
     </div>
 
     <div class="form-group">
         <label class="form-control-label" for="cardHolder">{l s='Titular de la tarjeta' mod='efipaypayment'}</label>
-        <input value="Stiven" type="text" name="cardHolder" id="cardHolder" class="form-control" placeholder="{l s='Full name' mod='efipaypayment'}" autocomplete="cc-name" required>
+        <input type="text" name="cardHolder" id="cardHolder" class="form-control" placeholder="{l s='Full name' mod='efipaypayment'}" autocomplete="cc-name" required>
     </div>
 
     <div class="row">
         <div class="form-group col-xs-6">
             <label class="form-control-label" for="cardCVC">{l s='CVV' mod='efipaypayment'}</label>
-            <input value="478" type="number" name="cardCVC" id="cardCVC" class="form-control" autocomplete="cc-csc" required>
+            <input type="number" name="cardCVC" id="cardCVC" class="form-control" autocomplete="cc-csc" required>
         </div>
 
         <div class="form-group col-xs-6">
             <label class="form-control-label" for="cardExpiration">{l s='Fecha expiración' mod='efipaypayment'}</label>
-            <input  type="month" name="cardExpiration" id="cardExpiration" class="form-control" placeholder="YYYY-MM" autocomplete="cc-exp" required>
+            <input type="month" name="cardExpiration" id="cardExpiration" class="form-control" placeholder="YYYY-MM" autocomplete="cc-exp" required>
         </div>
     </div>
 
@@ -54,7 +54,7 @@
         </div>
         <div class="form-group col-xs-6">
             <label class="form-control-label" for="idNumber">{l s='Número de documento' mod='efipaypayment'}</label>
-            <input value="1102934454" type="number" name="idNumber" id="idNumber" class="form-control" required>
+            <input type="number" name="idNumber" id="idNumber" class="form-control" required>
         </div>
     </div>
 
@@ -81,7 +81,7 @@
 
         <div class="form-group col-xs-4">
             <label class="form-control-label" for="cellphone">{l s='Número de celular' mod='efipaypayment'}</label>
-            <input value="3137994567" type="number" name="cellphone" id="cellphone" class="form-control" required>
+            <input type="number" name="cellphone" id="cellphone" class="form-control" required>
         </div>
     </div>
 </form>
