@@ -87,7 +87,7 @@ class EfipayPaymentExternalModuleFrontController extends ModuleFrontController
                 "result_urls" => [
                     "approved" => $this->context->link->getModuleLink($this->module->name, 'responseSuccess', ['orderId' => $this->context->cart->id], true),
                     "rejected" => $this->context->link->getModuleLink($this->module->name, 'responseError', ['orderId' => $this->context->cart->id], true),
-                    "pending" => "https://google.com/",
+                    "pending" => $this->context->link->getModuleLink($this->module->name, 'responsePending', ['orderId' => $this->context->cart->id], true),
                     "webhook" => $this->context->link->getModuleLink($this->module->name, 'webhook', [], true),
                 ],
                 "has_comments" => true,
