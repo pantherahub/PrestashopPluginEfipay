@@ -38,7 +38,7 @@ class EfipayPaymentEmbeddedModuleFrontController extends ModuleFrontController
 
         $this->bearerToken = Configuration::get(EfipayPayment::CONFIG_API_KEY);
         $this->idComercio = Configuration::get(EfipayPayment::CONFIG_ID_COMERCIO);
-        $this->urlBase = "https://efipay-sag.redpagos.co/api/v1/";
+        $this->urlBase = "https://sag.efipay.co/api/v1/";
     }
 
     /**
@@ -70,7 +70,7 @@ class EfipayPaymentEmbeddedModuleFrontController extends ModuleFrontController
 
         // Enviar la solicitud a la pasarela de pagos
         $paymentResponse = $this->generatePayment();
-
+    
         $cart = $this->context->cart;
         $totalAmount = $cart->getOrderTotal();
 
@@ -153,11 +153,6 @@ class EfipayPaymentEmbeddedModuleFrontController extends ModuleFrontController
                 "checkout_type" => "api"
             ],
             "advanced_options" => [
-                "result_urls" => [
-                    "approved" => "https://google.com/",
-                    "rejected" => "https://google.com/",
-                    "pending" => "https://google.com/",
-                ],
                 "has_comments" => true,
                 "comments_label" => "Aqui tu comentario"
             ],
@@ -165,8 +160,8 @@ class EfipayPaymentEmbeddedModuleFrontController extends ModuleFrontController
         ];
 
         $headers = [
-            'Content-Type' => 'application/json', // Ejemplo de encabezado
-            "Authorization" => "Bearer {$this->bearerToken}" // Ejemplo de encabezado con un token de autorización
+            "Accept" => "application/json",
+            "Authorization" => "Bearer {$this->bearerToken}"
         ];
         
         $client = new GuzzleHttp\Client();
@@ -225,9 +220,9 @@ class EfipayPaymentEmbeddedModuleFrontController extends ModuleFrontController
         ];
         
         $headers = [
-            'Content-Type' => 'application/json', // Ejemplo de encabezado
-            "Authorization" => "Bearer {$this->bearerToken}" // Ejemplo de encabezado con un token de autorización
-        ];
+            "Accept" => "application/json",
+            "Authorization" => "Bearer {$this->bearerToken}"
+        ];  
         
         $client = new GuzzleHttp\Client();
         
@@ -248,6 +243,9 @@ class EfipayPaymentEmbeddedModuleFrontController extends ModuleFrontController
                 ];
             } else {
                 $responseData = json_decode($body, true);
+
+                // var_dump($responseData);
+                // return;
         
                 return [
                     'paymentId' => $generatePaymentResponse['payment_id'],

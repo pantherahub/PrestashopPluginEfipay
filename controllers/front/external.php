@@ -33,7 +33,7 @@ class EfipayPaymentExternalModuleFrontController extends ModuleFrontController
 
         $this->bearerToken = Configuration::get(EfipayPayment::CONFIG_API_KEY);
         $this->idComercio = Configuration::get(EfipayPayment::CONFIG_ID_COMERCIO);
-        $this->urlBase = "https://efipay-sag.redpagos.co/api/v1/";
+        $this->urlBase = "https://sag.efipay.co/api/v1/";
     }
 
     /**
@@ -97,7 +97,7 @@ class EfipayPaymentExternalModuleFrontController extends ModuleFrontController
         ];
             
         $headers = [
-            'Content-Type' => 'application/json',
+            "Accept" => "application/json",
             "Authorization" => "Bearer {$this->bearerToken}"
         ];
         

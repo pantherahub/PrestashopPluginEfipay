@@ -31,7 +31,6 @@ class EfipayPayment extends PaymentModule
     const CONFIG_PO_EMBEDDED_ENABLED = 'PAYMENTEXAMPLE_PO_EMBEDDED_ENABLED';
 
     const CONFIG_ID_COMERCIO = 'ID_COMERCIO';
-    const CONFIG_PAYMENT_TOKEN = 'PAYMENT_TOKEN';
     const CONFIG_API_KEY = 'API_KEY';
 
     const MODULE_ADMIN_CONTROLLER = 'AdminConfigureEfipayPayment';
@@ -590,7 +589,7 @@ class EfipayPayment extends PaymentModule
     private function generateEmbeddedForm()
     {
         $client = new GuzzleHttp\Client();
-        $response = $client->get("https://efipay-sag.redpagos.co/api/v1/resources/identification-types-enum");
+        $response = $client->get("https://sag.efipay.co/api/v1/resources/identification-types-enum");
         $body = $response->getBody()->getContents();
         $identificationTypes = json_decode($body, true);
 
@@ -775,7 +774,6 @@ class EfipayPayment extends PaymentModule
             && (bool) Configuration::updateGlobalValue(static::CONFIG_PO_EMBEDDED_ENABLED, '1')
             
             && (string) Configuration::updateGlobalValue(static::CONFIG_ID_COMERCIO, '')
-            && (string) Configuration::updateGlobalValue(static::CONFIG_PAYMENT_TOKEN, '')
             && (string) Configuration::updateGlobalValue(static::CONFIG_API_KEY, '');
     }
 
@@ -790,7 +788,6 @@ class EfipayPayment extends PaymentModule
             && (bool) Configuration::deleteByName(static::CONFIG_PO_EMBEDDED_ENABLED)
 
             && (string) Configuration::deleteByName(static::CONFIG_ID_COMERCIO)
-            && (string) Configuration::deleteByName(static::CONFIG_PAYMENT_TOKEN)
             && (string) Configuration::deleteByName(static::CONFIG_API_KEY);
     }
 
