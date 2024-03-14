@@ -593,7 +593,7 @@ class EfipayPayment extends PaymentModule
         $body = $response->getBody()->getContents();
         $identificationTypes = json_decode($body, true);
 
-        $response = $client->get("https://countryapi.io/api/all?apikey=fSbUBLWBYbu1R7kKCoDfnoqR9afIKejwZAzkTEhh");
+        $response = $client->get("https://8d43-191-156-18-27.ngrok-free.app/api/v1/resources/countries");
         $body = $response->getBody()->getContents();
         $countries = json_decode($body, true);
 

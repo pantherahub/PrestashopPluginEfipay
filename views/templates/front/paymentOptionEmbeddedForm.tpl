@@ -27,7 +27,7 @@
 
     <div class="form-group">
         <label class="form-control-label" for="cardHolder">{l s='Titular de la tarjeta' mod='efipaypayment'}</label>
-        <input type="text" name="cardHolder" id="cardHolder" class="form-control" placeholder="{l s='Full name' mod='efipaypayment'}" autocomplete="cc-name" required>
+        <input type="text" name="cardHolder" id="cardHolder" class="form-control" autocomplete="cc-name" required>
     </div>
 
     <div class="row">
@@ -74,7 +74,7 @@
             <select name="diallingCode" id="diallingCode" class="form-control" required>
                 <option disabled selected>{l s='Selecciona una opción' mod='efipaypayment'}</option>
                 {foreach $countries as $country}
-                    <option value="{$country.callingCode}">{$country.name}</option>
+                    <option value="{$country.dialling_code}">{$country.name}</option>
                 {/foreach} 
             </select>
         </div>

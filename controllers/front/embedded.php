@@ -244,9 +244,6 @@ class EfipayPaymentEmbeddedModuleFrontController extends ModuleFrontController
             } else {
                 $responseData = json_decode($body, true);
 
-                // var_dump($responseData);
-                // return;
-        
                 return [
                     'paymentId' => $generatePaymentResponse['payment_id'],
                     'status' => isset($responseData['transaction']['status']) ? $responseData['transaction']['status'] : 'rechazada'

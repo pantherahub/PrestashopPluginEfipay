@@ -18,5 +18,5 @@
  *}
 
 <section id="efipaypayment-embedded">
-  <p>{l s='Embedded payment will add additional information in OrderPayment with data retrieved from form below ; Order will be created with OrderState "Payment accepted".' mod='efipaypayment'}</p>
+  <p>{l s='El pago integrado ofrece una forma de pago mediante el formulario sin redirección.' mod='efipaypayment'}</p>
 </section>

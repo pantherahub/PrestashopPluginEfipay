@@ -18,5 +18,5 @@
  *}
 
 <section id="efipaypayment-external">
-  <p>{l s='External payment like redirection to external secured payment page : Order will be created with OrderState "Remote payment accepted".' mod='efipaypayment'}</p>
+  <p>{l s='Pago externo como redirección a Efipay como página de pago segura externa.' mod='efipaypayment'}</p>
 </section>
