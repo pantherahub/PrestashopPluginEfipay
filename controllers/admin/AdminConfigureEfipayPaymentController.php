@@ -36,14 +36,14 @@ class AdminConfigureEfipayPaymentController extends ModuleAdminController
                 'fields' => [
                     EfipayPayment::CONFIG_PO_EXTERNAL_ENABLED => [
                         'type' => 'bool',
-                        'title' => $this->l('Allow to pay with external method'),
+                        'title' => $this->l('Permitir pagar con método external'),
                         'validation' => 'isBool',
                         'cast' => 'intval',
                         'required' => false,
                     ],
                     EfipayPayment::CONFIG_PO_EMBEDDED_ENABLED => [
                         'type' => 'bool',
-                        'title' => $this->l('Allow to pay with embedded method'),
+                        'title' => $this->l('Permitir pagar con método embedded'),
                         'validation' => 'isBool',
                         'cast' => 'intval',
                         'required' => false,
@@ -51,7 +51,7 @@ class AdminConfigureEfipayPaymentController extends ModuleAdminController
                              
                     EfipayPayment::CONFIG_ID_COMERCIO => [
                         'type' => 'text',
-                        'title' => $this->l('Id comercio'),
+                        'title' => $this->l('Id Sucursal/Oficina'),
                         'validation' => 'isInt',
                         'cast' => 'intval',
                         'required' => true,

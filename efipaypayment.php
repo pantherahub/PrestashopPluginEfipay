@@ -593,7 +593,7 @@ class EfipayPayment extends PaymentModule
         $body = $response->getBody()->getContents();
         $identificationTypes = json_decode($body, true);
 
-        $response = $client->get("https://8d43-191-156-18-27.ngrok-free.app/api/v1/resources/countries");
+        $response = $client->get("https://sag.efipay.co/api/v1/resources/get-countries");
         $body = $response->getBody()->getContents();
         $countries = json_decode($body, true);
 

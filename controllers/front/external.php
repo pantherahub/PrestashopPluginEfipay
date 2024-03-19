@@ -72,6 +72,13 @@ class EfipayPaymentExternalModuleFrontController extends ModuleFrontController
             true,
             $this->context->customer->secure_key
         );
+
+        $db = Db::getInstance();
+        $cartId = (int)$this->context->cart->id;
+        // Realiza una consulta SQL para obtener el ID de la orden asociada al carrito
+        $sql = "SELECT id_order FROM " . _DB_PREFIX_ . "orders WHERE id_cart = $cartId";
+        // Ejecuta la consulta SQL
+        $orderId = $db->getValue($sql);
        
         $data = [
             "payment" => [
@@ -82,12 +89,12 @@ class EfipayPaymentExternalModuleFrontController extends ModuleFrontController
             ],
             "advanced_options" => [
                 "references" => [
-                    (string)$this->context->cart->id,
+                    (string)$orderId,
                 ],
                 "result_urls" => [
-                    "approved" => $this->context->link->getModuleLink($this->module->name, 'responseSuccess', ['orderId' => $this->context->cart->id], true),
-                    "rejected" => $this->context->link->getModuleLink($this->module->name, 'responseError', ['orderId' => $this->context->cart->id], true),
-                    "pending" => $this->context->link->getModuleLink($this->module->name, 'responsePending', ['orderId' => $this->context->cart->id], true),
+                    "approved" => $this->context->link->getModuleLink($this->module->name, 'responseSuccess', ['orderId' => $orderId], true),
+                    "rejected" => $this->context->link->getModuleLink($this->module->name, 'responseError', ['orderId' => $orderId], true),
+                    "pending" => $this->context->link->getModuleLink($this->module->name, 'responsePending', ['orderId' => $orderId], true),
                     "webhook" => $this->context->link->getModuleLink($this->module->name, 'webhook', [], true),
                 ],
                 "has_comments" => true,

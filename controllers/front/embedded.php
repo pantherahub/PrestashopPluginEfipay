@@ -85,12 +85,19 @@ class EfipayPaymentEmbeddedModuleFrontController extends ModuleFrontController
             true,
             $this->context->customer->secure_key
         );
-        
+
+        $db = Db::getInstance();
+        $cartId = (int)$this->context->cart->id;
+        // Realiza una consulta SQL para obtener el ID de la orden asociada al carrito
+        $sql = "SELECT id_order FROM " . _DB_PREFIX_ . "orders WHERE id_cart = $cartId";
+        // Ejecuta la consulta SQL
+        $orderId = $db->getValue($sql);
+
         // Manejar la respuesta de la pasarela de pagos
         if ($paymentResponse['status'] == 'Aprobada') {
-            Tools::redirect($this->context->link->getModuleLink($this->module->name, 'responseSuccess', ['orderId' => $this->context->cart->id], true));
+            Tools::redirect($this->context->link->getModuleLink($this->module->name, 'responseSuccess', ['orderId' => $orderId], true));
         } else {       
-            Tools::redirect($this->context->link->getModuleLink($this->module->name, 'responseError', ['orderId' => $this->context->cart->id], true));
+            Tools::redirect($this->context->link->getModuleLink($this->module->name, 'responseError', ['orderId' => $orderId], true));
         }
     }
 
