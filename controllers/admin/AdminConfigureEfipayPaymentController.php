@@ -61,6 +61,11 @@ class AdminConfigureEfipayPaymentController extends ModuleAdminController
                         'title' => $this->l('Api Key'),
                         'required' => true,
                     ],
+                    EfipayPayment::CONFIG_ENV => [
+                        'type' => 'bool',
+                        'title' => $this->l('Activar entorno de produccion'),
+                        'required' => true,
+                    ],
                 ],
                 'submit' => [
                     'title' => $this->l('Save'),

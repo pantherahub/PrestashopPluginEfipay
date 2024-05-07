@@ -32,6 +32,7 @@ class EfipayPayment extends PaymentModule
 
     const CONFIG_ID_COMERCIO = 'ID_COMERCIO';
     const CONFIG_API_KEY = 'API_KEY';
+    const CONFIG_ENV = 'ENV';
 
     const MODULE_ADMIN_CONTROLLER = 'AdminConfigureEfipayPayment';
 
@@ -774,7 +775,9 @@ class EfipayPayment extends PaymentModule
             && (bool) Configuration::updateGlobalValue(static::CONFIG_PO_EMBEDDED_ENABLED, '1')
             
             && (string) Configuration::updateGlobalValue(static::CONFIG_ID_COMERCIO, '')
-            && (string) Configuration::updateGlobalValue(static::CONFIG_API_KEY, '');
+            && (string) Configuration::updateGlobalValue(static::CONFIG_API_KEY, '')
+            && (string) Configuration::updateGlobalValue(static::CONFIG_ENV, '');
+
     }
 
     /**
@@ -788,7 +791,9 @@ class EfipayPayment extends PaymentModule
             && (bool) Configuration::deleteByName(static::CONFIG_PO_EMBEDDED_ENABLED)
 
             && (string) Configuration::deleteByName(static::CONFIG_ID_COMERCIO)
-            && (string) Configuration::deleteByName(static::CONFIG_API_KEY);
+            && (string) Configuration::deleteByName(static::CONFIG_API_KEY)
+            && (string) Configuration::deleteByName(static::CONFIG_ENV);
+
     }
 
     /**

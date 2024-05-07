@@ -31,6 +31,9 @@ class EfipayPaymentEmbeddedModuleFrontController extends ModuleFrontController
     private $bearerToken;
     private $idComercio;
     private $urlBase;
+    private $env;
+    private $headers;
+    private \GuzzleHttp\Client $client;
 
     public function __construct()
     {
@@ -38,7 +41,16 @@ class EfipayPaymentEmbeddedModuleFrontController extends ModuleFrontController
 
         $this->bearerToken = Configuration::get(EfipayPayment::CONFIG_API_KEY);
         $this->idComercio = Configuration::get(EfipayPayment::CONFIG_ID_COMERCIO);
-        $this->urlBase = "https://sag.efipay.co/api/v1/";
+        $this->env = Configuration::get(EfipayPayment::CONFIG_ENV);
+        $url = $this->env ? 'sag.efipay.co' : 'efipay-sag.redpagos.co';
+        $this->urlBase = "https://" . $url . "/api/v1/";
+
+        $this->headers = [
+            "Accept" => "application/json",
+            "Authorization" => "Bearer {$this->bearerToken}"
+        ];
+
+        $this->client = new GuzzleHttp\Client();
     }
 
     /**
@@ -50,7 +62,7 @@ class EfipayPaymentEmbeddedModuleFrontController extends ModuleFrontController
             Tools::redirect($this->context->link->getPageLink(
                 'order',
                 true,
-                (int) $this->context->language->id,
+                (int)$this->context->language->id,
                 [
                     'step' => 1,
                 ]
@@ -61,22 +73,42 @@ class EfipayPaymentEmbeddedModuleFrontController extends ModuleFrontController
         // prueba validación de campos
         $form_error = $this->validateForm();
 
-        if(!empty($form_error)) {
+        if (!empty($form_error)) {
             $this->context->cookie->payment_error = $form_error;
             Tools::redirect('order');
         }
         // ---------------------------------------------------------
 
-
-        // Enviar la solicitud a la pasarela de pagos
         $paymentResponse = $this->generatePayment();
-    
+
+        if ($paymentResponse['status'] == 'Aprobada') {
+            $orderId = $this->getOrderId();
+            $this->procesingCart();
+            Tools::redirect($this->context->link->getModuleLink($this->module->name, 'responseSuccess', ['orderId' => $orderId], true));
+        } else {
+            $this->context->cookie->payment_error = 'La transaccion se rechazo intenta con otro metodo de pago';
+            Tools::redirect('order');
+        }
+    }
+
+    public function getOrderId()
+    {
+        $db = Db::getInstance();
+        $cartId = (int)$this->context->cart->id;
+        // Realiza una consulta SQL para obtener el ID de la orden asociada al carrito
+        $sql = "SELECT id_order FROM " . _DB_PREFIX_ . "orders WHERE id_cart = $cartId";
+        // Ejecuta la consulta SQL
+        return $db->getValue($sql);
+    }
+
+    public function procesingCart()
+    {
         $cart = $this->context->cart;
         $totalAmount = $cart->getOrderTotal();
 
         $this->module->validateOrder(
-            (int) $this->context->cart->id,
-            (int) Configuration::get('PS_OS_BANKWIRE'), 
+            (int)$this->context->cart->id,
+            (int)Configuration::get('PS_OS_BANKWIRE'),
             $totalAmount,
             $this->module->displayName, // Nombre del método de pago
             null,
@@ -86,22 +118,10 @@ class EfipayPaymentEmbeddedModuleFrontController extends ModuleFrontController
             $this->context->customer->secure_key
         );
 
-        $db = Db::getInstance();
-        $cartId = (int)$this->context->cart->id;
-        // Realiza una consulta SQL para obtener el ID de la orden asociada al carrito
-        $sql = "SELECT id_order FROM " . _DB_PREFIX_ . "orders WHERE id_cart = $cartId";
-        // Ejecuta la consulta SQL
-        $orderId = $db->getValue($sql);
-
-        // Manejar la respuesta de la pasarela de pagos
-        if ($paymentResponse['status'] == 'Aprobada') {
-            Tools::redirect($this->context->link->getModuleLink($this->module->name, 'responseSuccess', ['orderId' => $orderId], true));
-        } else {       
-            Tools::redirect($this->context->link->getModuleLink($this->module->name, 'responseError', ['orderId' => $orderId], true));
-        }
     }
 
-    private function validateForm() {
+    private function validateForm()
+    {
         if (!preg_match('/^\d{16}$/', Tools::getValue('cardNumber'))) {
             return "El campo Número de tarjeta es obligatorio.";
         }
@@ -166,44 +186,51 @@ class EfipayPaymentEmbeddedModuleFrontController extends ModuleFrontController
             "office" => $this->idComercio
         ];
 
-        $headers = [
-            "Accept" => "application/json",
-            "Authorization" => "Bearer {$this->bearerToken}"
-        ];
-        
-        $client = new GuzzleHttp\Client();
-        
+
         try {
-            $response = $client->post($this->urlBase.'payment/generate-payment', [
-                'headers' => $headers,
+            $response = $this->client->post($this->urlBase . 'payment/generate-payment', [
+                'headers' => $this->headers,
                 'json' => $data,
                 'http_errors' => false
             ]);
-        
+
             // Obtener el cuerpo de la respuesta
             $body = $response->getBody()->getContents();
-            
+
             // Verificar si hubo algún error
             if ($response->getStatusCode() != 200) {
                 echo 'Error: ' . $response->getStatusCode() . ' ' . $response->getReasonPhrase();
             } else {
                 // Parsear la respuesta JSON para obtener la URL de redirección
                 $responseData = json_decode($body, true);
-                $responseTransaction = $this->sendPaymentRequest($responseData);
-                return $responseTransaction;
+                return $this->sendPaymentRequest($responseData);
             }
         } catch (GuzzleHttp\Exception\RequestException $e) {
             echo 'Error: ' . $e->getCode() . ' ' . $e->getMessage();
         }
     }
 
+    /**
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
     private function sendPaymentRequest($generatePaymentResponse)
     {
         // Obtener el carrito de compra y el cliente
         $cart = $this->context->cart;
         $customer = new Customer($cart->id_customer);
-        $customerFullName = $customer->firstname.' '.$customer->lastname;
+        $customerFullName = $customer->firstname . ' ' . $customer->lastname;
+        $addresses = $customer->getAddresses($this->context->language->id);
+        $address = [];
+        foreach ($addresses as $address) {
+            $address[] = $customer->getSimpleAddress($address->id_address_delivery, $this->context->language->id);
+        }
 
+        $country = new Country($address['id_country']);
+        $iso_code = $country->iso_code;
+
+        $address['country_iso_code'] = $this->getCountryIso3($iso_code);
         $data = [
             "payment" => [
                 "id" => $generatePaymentResponse['payment_id'],
@@ -211,7 +238,13 @@ class EfipayPaymentEmbeddedModuleFrontController extends ModuleFrontController
             ],
             "customer_payer" => [
                 "name" => $customerFullName,
-                "email" => $customer->email
+                "email" => $customer->email,
+                'address_1' => $address['address1'],
+                'address_2' => $address['address2'],
+                'city' => $address['city'],
+                'state' => $address['state'] ?? $address['city'],
+                'zip_code'  => $address['postcode'],
+                'country'  => $address['country_iso_code'],
             ],
             "payment_card" => [
                 "number" => Tools::getValue('cardNumber'),
@@ -223,26 +256,20 @@ class EfipayPaymentEmbeddedModuleFrontController extends ModuleFrontController
                 "installments" => Tools::getValue('installments'),
                 "dialling_code" => Tools::getValue('diallingCode'),
                 "cellphone" => Tools::getValue('cellphone')
-            ] 
+            ]
         ];
-        
-        $headers = [
-            "Accept" => "application/json",
-            "Authorization" => "Bearer {$this->bearerToken}"
-        ];  
-        
-        $client = new GuzzleHttp\Client();
-        
+
+
         try {
             // Realizar la solicitud POST utilizando Guzzle
-            $response = $client->post($this->urlBase.'payment/transaction-checkout', [
-                'headers' => $headers,
+            $response = $this->client->post($this->urlBase . 'payment/transaction-checkout', [
+                'headers' => $this->headers,
                 'json' => $data,
             ]);
-        
+
             // Obtener el cuerpo de la respuesta
             $body = $response->getBody();
-            
+
             // Verificar si hubo algún error
             if ($response->getStatusCode() != 200) {
                 return [
@@ -259,6 +286,21 @@ class EfipayPaymentEmbeddedModuleFrontController extends ModuleFrontController
         } catch (GuzzleHttp\Exception\RequestException $e) {
             echo 'Error: ' . $e->getCode() . ' ' . $e->getMessage();
         }
+    }
+
+    /**
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    public function getCountryIso3($code)
+    {
+        $response = $this->client->get($this->urlBase . 'resources/get-countries', [
+            'headers' => $this->headers,
+            'http_errors' => false
+        ]);
+
+        // Obtener el cuerpo de la respuesta
+        $body = json_decode($response->getBody()->getContents(), true);
+        return $body[$code]['iso3_code'];
     }
 
     /**
@@ -293,7 +335,5 @@ class EfipayPaymentEmbeddedModuleFrontController extends ModuleFrontController
                 return true;
             }
         }
-
-        return false;
     }
 }
