@@ -80,44 +80,33 @@ class EfipayPaymentEmbeddedModuleFrontController extends ModuleFrontController
         // ---------------------------------------------------------
 
         $paymentResponse = $this->generatePayment();
-
         if ($paymentResponse['status'] == 'Aprobada') {
-            $orderId = $this->getOrderId();
-            $this->procesingCart();
+            $cart = $this->context->cart;
+            $totalAmount = $cart->getOrderTotal();
+
+            $this->module->validateOrder(
+                (int)$this->context->cart->id,
+                (int)Configuration::get('PS_OS_BANKWIRE'),
+                $totalAmount,
+                $this->module->displayName, // Nombre del método de pago
+                null,
+                ['transaction_id' => Tools::passwdGen()], // Información adicional
+                $cart->id_currency,
+                true,
+                $this->context->customer->secure_key
+            );
+
+            $db = Db::getInstance();
+            $cartId = (int)$this->context->cart->id;
+            // Realiza una consulta SQL para obtener el ID de la orden asociada al carrito
+            $sql = "SELECT id_order FROM " . _DB_PREFIX_ . "orders WHERE id_cart = $cartId";
+            // Ejecuta la consulta SQL
+            $orderId = $db->getValue($sql);
             Tools::redirect($this->context->link->getModuleLink($this->module->name, 'responseSuccess', ['orderId' => $orderId], true));
         } else {
             $this->context->cookie->payment_error = 'La transaccion se rechazo intenta con otro metodo de pago';
             Tools::redirect('order');
         }
-    }
-
-    public function getOrderId()
-    {
-        $db = Db::getInstance();
-        $cartId = (int)$this->context->cart->id;
-        // Realiza una consulta SQL para obtener el ID de la orden asociada al carrito
-        $sql = "SELECT id_order FROM " . _DB_PREFIX_ . "orders WHERE id_cart = $cartId";
-        // Ejecuta la consulta SQL
-        return $db->getValue($sql);
-    }
-
-    public function procesingCart()
-    {
-        $cart = $this->context->cart;
-        $totalAmount = $cart->getOrderTotal();
-
-        $this->module->validateOrder(
-            (int)$this->context->cart->id,
-            (int)Configuration::get('PS_OS_BANKWIRE'),
-            $totalAmount,
-            $this->module->displayName, // Nombre del método de pago
-            null,
-            ['transaction_id' => Tools::passwdGen()], // Información adicional
-            $cart->id_currency,
-            true,
-            $this->context->customer->secure_key
-        );
-
     }
 
     private function validateForm()
@@ -222,10 +211,7 @@ class EfipayPaymentEmbeddedModuleFrontController extends ModuleFrontController
         $customer = new Customer($cart->id_customer);
         $customerFullName = $customer->firstname . ' ' . $customer->lastname;
         $addresses = $customer->getAddresses($this->context->language->id);
-        $address = [];
-        foreach ($addresses as $address) {
-            $address[] = $customer->getSimpleAddress($address->id_address_delivery, $this->context->language->id);
-        }
+        $address = $addresses[0];
 
         $country = new Country($address['id_country']);
         $iso_code = $country->iso_code;
