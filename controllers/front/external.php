@@ -26,6 +26,7 @@ class EfipayPaymentExternalModuleFrontController extends ModuleFrontController
     private $bearerToken;
     private $idComercio;
     private $urlBase;
+    private $env;
 
     public function __construct()
     {
@@ -33,7 +34,10 @@ class EfipayPaymentExternalModuleFrontController extends ModuleFrontController
 
         $this->bearerToken = Configuration::get(EfipayPayment::CONFIG_API_KEY);
         $this->idComercio = Configuration::get(EfipayPayment::CONFIG_ID_COMERCIO);
-        $this->urlBase = "https://sag.efipay.co/api/v1/";
+        $this->env = Configuration::get(EfipayPayment::CONFIG_ENV);
+        $url = $this->env ? 'sag.efipay.co' : 'efipay-sag.redpagos.co';
+
+        $this->urlBase = "https://" . $url . "/api/v1/";
     }
 
     /**
