@@ -20,6 +20,15 @@
 
 class EfipayPaymentWebhookModuleFrontController extends ModuleFrontController
 {
+    private $tokenWebhook;
+
+    public function __construct()
+    {
+        parent::__construct();
+
+        $this->tokenWebhook = Configuration::get(EfipayPayment::CONFIG_TOKEN_WEBHOOK);
+    }
+      
     public function initContent()
     {
         parent::initContent();
@@ -27,17 +36,30 @@ class EfipayPaymentWebhookModuleFrontController extends ModuleFrontController
         // Verificar si la solicitud se realizó utilizando el método POST
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $data = json_decode(file_get_contents('php://input'), true);
+            $headers = getallheaders();
         }
         
-        // Procesar los datos y actualizar la orden en PrestaShop
-        if ($this->module->processWebhookData($data)) {
-            // Enviar una respuesta exitosa
-            http_response_code(200);
-            echo "Webhook procesado correctamente";
-        } else {
-            // Enviar una respuesta de error
-            http_response_code(400);
-            echo "Error al procesar el webhook";
+        try {
+            if(empty($headers["signature"]) || is_null($headers["signature"])) {
+                $this->module->processWebhookData($data);
+            }
+            
+            $computedSignature = hash_hmac('sha256', json_encode($data), $this->tokenWebhook);
+
+            if(hash_equals($headers["signature"], $computedSignature)) {
+                // Procesar los datos y actualizar la orden en PrestaShop
+                if ($this->module->processWebhookData($data)) {
+                    // Enviar una respuesta exitosa
+                    http_response_code(200);
+                    echo "Webhook procesado correctamente";
+                } else {
+                    // Enviar una respuesta de error
+                    http_response_code(400);
+                    echo "Error al procesar el webhook";
+                }
+            }
+        } catch (Exception $e) {
+            print_r($e->getMessage());
         }
     }
 }

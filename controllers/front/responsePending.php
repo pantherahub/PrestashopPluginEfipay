@@ -21,7 +21,7 @@
 /**
  * This Controller simulate an external payment gateway
  */
-class EfipayPaymentResponseErrorModuleFrontController extends ModuleFrontController
+class EfipayPaymentResponsePendingModuleFrontController extends ModuleFrontController
 {
     /**
      * {@inheritdoc}

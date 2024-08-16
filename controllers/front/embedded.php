@@ -31,7 +31,6 @@ class EfipayPaymentEmbeddedModuleFrontController extends ModuleFrontController
     private $bearerToken;
     private $idComercio;
     private $urlBase;
-    private $env;
     private $headers;
     private \GuzzleHttp\Client $client;
 
@@ -41,9 +40,8 @@ class EfipayPaymentEmbeddedModuleFrontController extends ModuleFrontController
 
         $this->bearerToken = Configuration::get(EfipayPayment::CONFIG_API_KEY);
         $this->idComercio = Configuration::get(EfipayPayment::CONFIG_ID_COMERCIO);
-        $this->env = Configuration::get(EfipayPayment::CONFIG_ENV);
-        $url = $this->env ? 'sag.efipay.co' : 'efipay-sag.redpagos.co';
-        $this->urlBase = "https://" . $url . "/api/v1/";
+    
+        $this->urlBase = "https://sag.efipay.co/api/v1/";
 
         $this->headers = [
             "Accept" => "application/json",
@@ -147,6 +145,10 @@ class EfipayPaymentEmbeddedModuleFrontController extends ModuleFrontController
             return "El campo numero celular es obligatorio y debe ser un numero valido.";
         }
 
+        if(!Configuration::get(EfipayPayment::CONFIG_API_KEY) || !Configuration::get(EfipayPayment::CONFIG_ID_COMERCIO) || !Configuration::get(EfipayPayment::CONFIG_TOKEN_WEBHOOK)) {
+            return "Oops, algo salio mal. Por favor comunicate con el administrador.";     
+        }
+
         return '';
     }
 
@@ -226,11 +228,11 @@ class EfipayPaymentEmbeddedModuleFrontController extends ModuleFrontController
                 "name" => $customerFullName,
                 "email" => $customer->email,
                 'address_1' => $address['address1'],
-                'address_2' => $address['address2'],
+                'address_2' => isset($address['address2']) && !empty($address['address2']) ? $address['address2'] : 'calle 43',
                 'city' => $address['city'],
                 'state' => $address['state'] ?? $address['city'],
-                'zip_code'  => $address['postcode'],
-                'country'  => $address['country_iso_code'],
+                'zip_code'  => $address['postcode'] ?? '00000',
+                'country'  => $address['country_iso_code'] ?? 'COL',
             ],
             "payment_card" => [
                 "number" => Tools::getValue('cardNumber'),
@@ -270,6 +272,14 @@ class EfipayPaymentEmbeddedModuleFrontController extends ModuleFrontController
                 ];
             }
         } catch (GuzzleHttp\Exception\RequestException $e) {
+            if ($e->hasResponse() && $e->getResponse()->getStatusCode() === 422) {
+                $responseBody = $e->getResponse()->getBody()->getContents();
+                $errors = json_decode($responseBody, true);
+        
+                $this->context->cookie->payment_error = $errors["message"];
+                Tools::redirect('order');
+            }
+
             echo 'Error: ' . $e->getCode() . ' ' . $e->getMessage();
         }
     }
