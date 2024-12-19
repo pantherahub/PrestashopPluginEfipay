@@ -55,7 +55,7 @@ class EfipayPayment extends PaymentModule
     {
         $this->name = 'efipaypayment';
         $this->tab = 'payments_gateways';
-        $this->version = '1.0.0';
+        $this->version = '1.0.0.4';
         $this->author = 'Efipay';
         $this->currencies = true;
         $this->currencies_mode = 'checkbox';
