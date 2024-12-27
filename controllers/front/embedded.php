@@ -190,13 +190,16 @@ class EfipayPaymentEmbeddedModuleFrontController extends ModuleFrontController
 
             // Verificar si hubo algún error
             if ($response->getStatusCode() != 200) {
+                PrestaShopLogger::addLog('Error: ' . $response->getStatusCode() . ' ' . $response->getReasonPhrase(), 3);
                 echo 'Error: ' . $response->getStatusCode() . ' ' . $response->getReasonPhrase();
             } else {
                 // Parsear la respuesta JSON para obtener la URL de redirección
                 $responseData = json_decode($body, true);
+                PrestaShopLogger::addLog('Payment request successful: ' . json_encode($responseData), 1);
                 return $this->sendPaymentRequest($responseData);
             }
         } catch (GuzzleHttp\Exception\RequestException $e) {
+            PrestaShopLogger::addLog('RequestException: ' . $e->getCode() . ' ' . $e->getMessage(), 3);
             echo 'Error: ' . $e->getCode() . ' ' . $e->getMessage();
         }
     }
@@ -260,11 +263,13 @@ class EfipayPaymentEmbeddedModuleFrontController extends ModuleFrontController
 
             // Verificar si hubo algún error
             if ($response->getStatusCode() != 200) {
+                PrestaShopLogger::addLog('Error: ' . $response->getStatusCode() . ' ' . $response->getReasonPhrase(), 3);
                 return [
                     'status' => 'rechazada'
                 ];
             } else {
                 $responseData = json_decode($body, true);
+                PrestaShopLogger::addLog('Transaction checkout successful: ' . json_encode($responseData), 1);
 
                 return [
                     'paymentId' => $generatePaymentResponse['payment_id'],
@@ -281,6 +286,7 @@ class EfipayPaymentEmbeddedModuleFrontController extends ModuleFrontController
             }
 
             echo 'Error: ' . $e->getCode() . ' ' . $e->getMessage();
+            PrestaShopLogger::addLog('RequestException: ' . $e->getCode() . ' ' . $e->getMessage(), 3);
         }
     }
 

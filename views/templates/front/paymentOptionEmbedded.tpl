@@ -18,5 +18,5 @@
  *}
 
 <section id="efipaypayment-embedded">
-  <p>{l s='El pago integrado ofrece una forma de pago mediante el formulario sin redirección.' mod='efipaypayment'}</p>
+  <p>{l s='El pago integrado de Efipay ofrece una forma de pago mediante el formulario sin redirección.' mod='efipaypayment'}</p>
 </section>
