@@ -50,10 +50,24 @@ class EfipayPaymentWebhookModuleFrontController extends ModuleFrontController
                 // Procesar los datos y actualizar la orden en PrestaShop
                 if ($this->module->processWebhookData($data)) {
                     // Enviar una respuesta exitosa
+                    PrestaShopLogger::addLog(
+                        "Webhook procesado correctamente para los datos: " . json_encode($data),
+                        1,
+                        null,
+                        null,
+                        true
+                    );
                     http_response_code(200);
                     echo "Webhook procesado correctamente";
                 } else {
                     // Enviar una respuesta de error
+                    PrestaShopLogger::addLog(
+                        "Error al procesar el webhook con datos: " . json_encode($data),
+                        3,
+                        null,
+                        null,
+                        true
+                    );
                     http_response_code(400);
                     echo "Error al procesar el webhook";
                 }

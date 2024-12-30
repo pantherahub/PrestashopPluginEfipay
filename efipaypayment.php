@@ -55,7 +55,7 @@ class EfipayPayment extends PaymentModule
     {
         $this->name = 'efipaypayment';
         $this->tab = 'payments_gateways';
-        $this->version = '1.0.0.4';
+        $this->version = '1.0.0.5';
         $this->author = 'Efipay';
         $this->currencies = true;
         $this->currencies_mode = 'checkbox';
@@ -550,7 +550,7 @@ class EfipayPayment extends PaymentModule
     {
         $externalOption = new PaymentOption();
         $externalOption->setModuleName($this->name);
-        $externalOption->setCallToActionText($this->l('Pay external'));
+        $externalOption->setCallToActionText($this->l('Efipay pago externo'));
         $externalOption->setAction($this->context->link->getModuleLink($this->name, 'external', [], true));
         $externalOption->setInputs([
             'token' => [
@@ -574,7 +574,7 @@ class EfipayPayment extends PaymentModule
     {
         $embeddedOption = new PaymentOption();
         $embeddedOption->setModuleName($this->name);
-        $embeddedOption->setCallToActionText($this->l('Pay embedded'));
+        $embeddedOption->setCallToActionText($this->l('Efipay pago embebido'));
         $embeddedOption->setForm($this->generateEmbeddedForm());
         $embeddedOption->setAdditionalInformation($this->context->smarty->fetch('module:efipaypayment/views/templates/front/paymentOptionEmbedded.tpl'));
         $embeddedOption->setLogo(Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/option/embedded.png'));

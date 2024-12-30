@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<module>
+    <name>efipaypayment</name>
+    <displayName><![CDATA[Efipay Payments]]></displayName>
+    <version><![CDATA[1.0.0]]></version>
+    <description><![CDATA[plugin para realizar a trav&eacute;s de nuestro checkout de pagos Efipay]]></description>
+    <author><![CDATA[Efipay]]></author>
+    <tab><![CDATA[payments_gateways]]></tab>
+    <is_configurable>1</is_configurable>
+    <need_instance>1</need_instance>
+</module>
