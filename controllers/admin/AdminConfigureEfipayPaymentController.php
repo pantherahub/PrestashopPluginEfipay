@@ -48,7 +48,13 @@ class AdminConfigureEfipayPaymentController extends ModuleAdminController
                         'cast' => 'intval',
                         'required' => false,
                     ],
-                             
+                    EfipayPayment::CONFIG_LIMIT_PAYMENT => [
+                        'type' => 'bool',
+                        'title' => $this->l('Habilitar límite de fecha de pago a 1 día'),
+                        'validation' => 'isBool',
+                        'cast' => 'intval',
+                        'required' => false,
+                    ],                
                     EfipayPayment::CONFIG_ID_COMERCIO => [
                         'type' => 'text',
                         'title' => $this->l('Id Sucursal/Oficina'),

@@ -30,6 +30,7 @@ class EfipayPaymentEmbeddedModuleFrontController extends ModuleFrontController
 
     private $bearerToken;
     private $idComercio;
+    private $limitPayment;
     private $urlBase;
     private $headers;
     private \GuzzleHttp\Client $client;
@@ -40,10 +41,12 @@ class EfipayPaymentEmbeddedModuleFrontController extends ModuleFrontController
 
         $this->bearerToken = Configuration::get(EfipayPayment::CONFIG_API_KEY);
         $this->idComercio = Configuration::get(EfipayPayment::CONFIG_ID_COMERCIO);
-    
+        $this->limitPayment = Configuration::get(EfipayPayment::CONFIG_LIMIT_PAYMENT);
+
         $this->urlBase = "https://sag.efipay.co/api/v1/";
 
         $this->headers = [
+            "Content-Type" => "application/json",
             "Accept" => "application/json",
             "Authorization" => "Bearer {$this->bearerToken}"
         ];
@@ -82,17 +85,17 @@ class EfipayPaymentEmbeddedModuleFrontController extends ModuleFrontController
             $cart = $this->context->cart;
             $totalAmount = $cart->getOrderTotal();
 
-            $this->module->validateOrder(
-                (int)$this->context->cart->id,
-                (int)Configuration::get('PS_OS_BANKWIRE'),
-                $totalAmount,
-                $this->module->displayName, // Nombre del método de pago
-                null,
-                ['transaction_id' => Tools::passwdGen()], // Información adicional
-                $cart->id_currency,
-                true,
-                $this->context->customer->secure_key
-            );
+            // $this->module->validateOrder(
+            //     (int)$this->context->cart->id,
+            //     (int)Configuration::get('PS_OS_BANKWIRE'),
+            //     $totalAmount,
+            //     $this->module->displayName, // Nombre del método de pago
+            //     null,
+            //     ['transaction_id' => Tools::passwdGen()], // Información adicional
+            //     $cart->id_currency,
+            //     true,
+            //     $this->context->customer->secure_key
+            // );
 
             $db = Db::getInstance();
             $cartId = (int)$this->context->cart->id;
@@ -163,20 +166,48 @@ class EfipayPaymentEmbeddedModuleFrontController extends ModuleFrontController
         $currency = new Currency($cart->id_currency);
         $currencyCode = $currency->iso_code;
 
+        $this->module->validateOrder(
+            (int)$this->context->cart->id,
+            (int)Configuration::get('PS_OS_BANKWIRE'),
+            $totalAmount,
+            $this->module->displayName, // Nombre del método de pago
+            null,
+            ['transaction_id' => Tools::passwdGen()], // Información adicional
+            $cart->id_currency,
+            true,
+            $this->context->customer->secure_key
+        );
+
+        $db = Db::getInstance();
+        $cartId = (int)$this->context->cart->id;
+        // Realiza una consulta SQL para obtener el ID de la orden asociada al carrito
+        $sql = "SELECT id_order FROM " . _DB_PREFIX_ . "orders WHERE id_cart = $cartId";
+        // Ejecuta la consulta SQL
+        $orderId = $db->getValue($sql);
+
+        $customer = new Customer($cart->id_customer);
+
         $data = [
             "payment" => [
-                "description" => 'Pago Plugin Prestashop',
+                "description" => 'Pago del pedido Prestashop: '.$orderId,
                 "amount" => $totalAmount,
                 "currency_type" => $currencyCode,
                 "checkout_type" => "api"
             ],
             "advanced_options" => [
-                "has_comments" => true,
-                "comments_label" => "Aqui tu comentario"
+                "references" => [
+                    (string)$orderId,
+                    $customer->email,
+                    "Plugin Prestashop"
+                ],
+                "has_comments" => false,
             ],
             "office" => $this->idComercio
         ];
 
+        if($this->limitPayment) {
+            $data['advanced_options']['limit_date'] = date('Y-m-d', strtotime('+1 day'));
+        }
 
         try {
             $response = $this->client->post($this->urlBase . 'payment/generate-payment', [

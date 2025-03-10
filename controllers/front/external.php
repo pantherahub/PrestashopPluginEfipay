@@ -26,6 +26,7 @@ class EfipayPaymentExternalModuleFrontController extends ModuleFrontController
     private $bearerToken;
     private $idComercio;
     private $urlBase;
+    private $limitPayment;
 
     public function __construct()
     {
@@ -33,6 +34,7 @@ class EfipayPaymentExternalModuleFrontController extends ModuleFrontController
 
         $this->bearerToken = Configuration::get(EfipayPayment::CONFIG_API_KEY);
         $this->idComercio = Configuration::get(EfipayPayment::CONFIG_ID_COMERCIO);
+        $this->limitPayment = Configuration::get(EfipayPayment::CONFIG_LIMIT_PAYMENT);
     
         $this->urlBase = "https://sag.efipay.co/api/v1/";
     }
@@ -85,10 +87,12 @@ class EfipayPaymentExternalModuleFrontController extends ModuleFrontController
         $sql = "SELECT id_order FROM " . _DB_PREFIX_ . "orders WHERE id_cart = $cartId";
         // Ejecuta la consulta SQL
         $orderId = $db->getValue($sql);
+
+        $customer = new Customer($cart->id_customer);
        
         $data = [
             "payment" => [
-                "description" => 'Pago Plugin Prestashop',
+                "description" => 'Pago del pedido Prestashop: '.$orderId,
                 "amount" => $totalAmount,
                 "currency_type" => $currencyCode,
                 "checkout_type" => "redirect"
@@ -96,6 +100,8 @@ class EfipayPaymentExternalModuleFrontController extends ModuleFrontController
             "advanced_options" => [
                 "references" => [
                     (string)$orderId,
+                    $customer->email,
+                    "Plugin Prestashop"
                 ],
                 "result_urls" => [
                     "approved" => $this->context->link->getModuleLink($this->module->name, 'responseSuccess', ['orderId' => $orderId], true),
@@ -103,11 +109,14 @@ class EfipayPaymentExternalModuleFrontController extends ModuleFrontController
                     "pending" => $this->context->link->getModuleLink($this->module->name, 'responsePending', ['orderId' => $orderId], true),
                     "webhook" => $this->context->link->getModuleLink($this->module->name, 'webhook', [], true),
                 ],
-                "has_comments" => true,
-                "comments_label" => "Aqui tu comentario"
+                "has_comments" => false,
             ],
             "office" => $this->idComercio
         ];
+
+        if($this->limitPayment) {
+            $data['advanced_options']['limit_date'] = date('Y-m-d', strtotime('+1 day'));
+        }
             
         $headers = [
             "Accept" => "application/json",

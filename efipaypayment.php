@@ -33,6 +33,7 @@ class EfipayPayment extends PaymentModule
     const CONFIG_ID_COMERCIO = 'ID_COMERCIO';
     const CONFIG_API_KEY = 'API_KEY';
     const CONFIG_TOKEN_WEBHOOK = 'TOKEN_WEBHOOK';
+    const CONFIG_LIMIT_PAYMENT = 'LIMIT_PAYMENT';
 
     const MODULE_ADMIN_CONTROLLER = 'AdminConfigureEfipayPayment';
 
@@ -270,11 +271,13 @@ class EfipayPayment extends PaymentModule
         switch ($status) {
             case 'Aprobada':
                 return Configuration::get('PS_OS_PAYMENT'); // Estado de pago aprobado en PrestaShop
-            case 'Rechazada':
-                return Configuration::get('PS_OS_ERROR'); // Estado de error en PrestaShop
             case 'Pendiente':
+            case 'Iniciada':
+            case 'Por Pagar':
                 return Configuration::get('PS_OS_PREPARATION'); // Estado de preparación en PrestaShop
-            // Agrega más casos según tus necesidades
+            case 'Reversada':
+            case 'Reversion Escalada':
+                return Configuration::get('PS_OS_REFUND');
             default:
                 return Configuration::get('PS_OS_ERROR'); // Estado de error en PrestaShop (por defecto)
         }
@@ -776,7 +779,8 @@ class EfipayPayment extends PaymentModule
             
             && (string) Configuration::updateGlobalValue(static::CONFIG_ID_COMERCIO, '')
             && (string) Configuration::updateGlobalValue(static::CONFIG_API_KEY, '')
-            && (string) Configuration::updateGlobalValue(static::CONFIG_TOKEN_WEBHOOK, '');
+            && (string) Configuration::updateGlobalValue(static::CONFIG_TOKEN_WEBHOOK, '')
+            && (string) Configuration::updateGlobalValue(static::CONFIG_LIMIT_PAYMENT, '1');
     }
 
     /**
@@ -791,7 +795,8 @@ class EfipayPayment extends PaymentModule
 
             && (string) Configuration::deleteByName(static::CONFIG_ID_COMERCIO)
             && (string) Configuration::deleteByName(static::CONFIG_API_KEY)
-            && (string) Configuration::deleteByName(static::CONFIG_TOKEN_WEBHOOK);
+            && (string) Configuration::deleteByName(static::CONFIG_TOKEN_WEBHOOK)
+            && (string) Configuration::deleteByName(static::CONFIG_LIMIT_PAYMENT);
     }
 
     /**
